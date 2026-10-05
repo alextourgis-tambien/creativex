@@ -59,30 +59,29 @@
     const label = textElement || element.querySelector('.button-text');
     if (!label || !label.textContent.trim() || label.querySelector('a,button,input')) return;
     prepared.add(element);
-    const leading = getComputedStyle(label).lineHeight;
-    const previousLeading = label.style.getPropertyValue('--cx-original-leading');
-    label.style.setProperty('--cx-original-leading', leading === 'normal' ? '1.4em' : leading);
-    const row = document.createElement('span'); row.className = 'cx-button-row';
+    const isButton = element.matches('.button,[data-cx-button]');
+    const row = document.createElement('span'); row.className = 'cx-hover-text';
     while (label.firstChild) row.appendChild(label.firstChild);
-    const copy = row.cloneNode(true);
-    copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
-    copy.classList.add('cx-button-copy'); copy.setAttribute('aria-hidden', 'true');
-    label.classList.add('cx-button-label'); label.append(row, copy);
+    label.classList.add('cx-hover-label');
+    if (!isButton) label.classList.add('cx-hover-link');
+    label.append(row);
+    const previousProgress = label.style.getPropertyValue('--cx-link-progress');
     let tween;
     function move(enter) {
       if (tween) tween.kill();
-      const distance = row.getBoundingClientRect().height + parseFloat(getComputedStyle(label).fontSize) * 0.35;
-      tween = gsap.to([row, copy], { y: enter ? -distance : 0, duration: 0.45, ease: 'power3.out', overwrite: true });
+      tween = isButton
+        ? gsap.to(row, { y: enter ? -1.5 : 0, duration: 0.4, ease: 'power2.out', overwrite: true })
+        : gsap.to(label, { '--cx-link-progress': enter ? 1 : 0, duration: 0.45, ease: 'power2.out', overwrite: true });
     }
     listen(element, 'pointerenter', e => { if (e.pointerType !== 'touch') move(true); });
     listen(element, 'pointerleave', () => { if (!element.matches(':focus-visible')) move(false); });
     listen(element, 'focus', () => move(true)); listen(element, 'blur', () => move(false));
     cleanups.push(() => {
-      if (tween) tween.kill(); copy.remove();
+      if (tween) tween.kill();
       while (row.firstChild) label.insertBefore(row.firstChild, row);
-      row.remove(); label.classList.remove('cx-button-label');
-      if (previousLeading) label.style.setProperty('--cx-original-leading', previousLeading);
-      else label.style.removeProperty('--cx-original-leading');
+      row.remove(); label.classList.remove('cx-hover-label', 'cx-hover-link');
+      if (previousProgress) label.style.setProperty('--cx-link-progress', previousProgress);
+      else label.style.removeProperty('--cx-link-progress');
     });
   }
   function prepare() {
