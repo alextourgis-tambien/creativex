@@ -69,3 +69,8 @@ html.lenis, html.lenis body { height: auto; }
   .cx-system-node[class*="is-"] { padding: 0.6em 0.85em; }
   .cx-system-particle { width: 3px; height: 3px; }
 }
+
+/* Keep the fixed-size category preview flush with the section’s right edge. */
+@media (min-width: 992px) {
+  .category-wrapper > .category-cms.s--mg > .category-list { align-items: flex-end; }
+}
