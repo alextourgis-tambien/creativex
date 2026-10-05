@@ -347,12 +347,18 @@
       gsap.fromTo(layer, { rotation: -0.9 }, { rotation: 0.9, duration: 4.6 + index * 0.23, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true })
     ];
     loops.forEach((loop, axis) => loop.progress((index * 0.17 + axis * 0.23) % 1));
-    let inView = false;
-    function state() { loops.forEach(loop => loop.paused(!inView || document.hidden)); }
+    let inView = false, entered = false;
+    function state() { loops.forEach(loop => loop.paused(!entered || !inView || document.hidden)); }
+    const entrance = gsap.fromTo(layer, { scale: 0.82, opacity: 0 }, {
+      scale: 1, opacity: 1, duration: 0.95, ease: 'back.out(1.25)',
+      scrollTrigger: { trigger: card, start: 'top 92%', once: true },
+      onComplete: () => { entered = true; state(); }
+    });
     const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; state(); }, { rootMargin: '70px' });
     observer.observe(card); listen(document, 'visibilitychange', state);
     cleanups.push(() => {
       observer.disconnect(); loops.forEach(loop => loop.kill());
+      if (entrance.scrollTrigger) entrance.scrollTrigger.kill(); entrance.kill();
       while (layer.firstChild) card.insertBefore(layer.firstChild, layer);
       layer.remove(); card.classList.remove('cx-obs-floating');
     });

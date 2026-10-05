@@ -48,7 +48,9 @@ sections `.section-observability` et `.section-bussiness` sont conservées.
 La section `.images-loop-wrapper` utilise désormais le radial marquee ci-dessous ;
 les trois séquences restent exclues des révélations de texte globales.
 
-Les `.obs-card` flottent en continu : déplacement vertical de 6 à 13 px, légère
+Les `.obs-card` apparaissent une fois à l'entrée dans la vue : échelle de 82 %
+à 100 %, fondu et léger rebond sur 0,95 seconde. Le flottement démarre ensuite.
+Elles flottent en continu : déplacement vertical de 6 à 13 px, légère
 dérive horizontale et oscillation de 0,9 degré. Chaque carte a une phase et une
 durée différentes. Les trois états d'image sont déplacés ensemble dans un calque
 interne ; le conteneur conserve sa trajectoire GSAP au scroll. Les boucles sont
