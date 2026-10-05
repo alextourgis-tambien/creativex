@@ -23,6 +23,11 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
   Durée de 0,55 s par lettre, décalage total plafonné à 0,14 s, courbe `power3.inOut`,
   retour fluide en sens inverse. Les icônes restent fixes et le masque laisse de la marge
   aux accents et descendantes.
+- Logos CMS `.logo-wrapper` / `.logos-list` / `.logos-item` : ruban GSAP sans coupure,
+  34 px/s sur desktop et 24 px/s sur mobile, accélération douce liée à la vitesse de scroll.
+  Arrêt progressif au survol ou au focus, reprise amortie, entrée décalée et bords estompés.
+  Copies décoratives `aria-hidden` et `inert`, largeur recalculée après chargement des images
+  et redimensionnement ; pause hors écran ou onglet masqué. Mouvement réduit : liste native.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.
@@ -60,6 +65,7 @@ ne sont pas découpés, et les titres gardent leur nom accessible.
 
 - `data-cx-reveal` : ajouter une révélation de texte à un élément simple.
 - `data-cx-button` : ajouter le remplissage directionnel à un bouton contenant `.button-text`.
+- `data-cx-marquee-speed` : vitesse de base du ruban en pixels/seconde.
 - `data-cx-hover-bg` / `data-cx-hover-color` : personnaliser le fond et le texte du bouton au survol.
 - `data-cx-motion="off"` : exclure un composant des nouvelles animations.
 - `data-cx-transition="off"` : garder la navigation native d'un lien.

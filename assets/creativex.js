@@ -150,6 +150,70 @@
       button(element, element.querySelector('.footer-link-text') || element);
     });
     document.querySelectorAll('.obs-card').forEach(floatCard);
+    document.querySelectorAll('.logo-wrapper').forEach(logoMarquee);
+  }
+  function logoMarquee(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const list = wrapper.querySelector('.logos-list');
+    if (!list) return;
+    const items = Array.from(list.children).filter(item => item.matches('.logos-item'));
+    if (!items.length) return;
+    const originalStyles = items.map(item => item.getAttribute('style'));
+    prepared.add(wrapper); wrapper.classList.add('cx-logos-marquee');
+    let copies = [], cycle = 0, position = 0, speed = 0, inView = false, hovering = false, focusing = false;
+    const previousStyle = list.getAttribute('style');
+    const setX = gsap.quickSetter(list, 'x', 'px');
+    function measure() {
+      const previousCycle = cycle;
+      copies.forEach(copy => copy.remove()); copies = [];
+      const first = items[0].getBoundingClientRect(), last = items[items.length - 1].getBoundingClientRect();
+      const gap = parseFloat(getComputedStyle(list).columnGap) || 0;
+      cycle = last.right - first.left + gap;
+      if (cycle <= 0 || !wrapper.clientWidth) { cycle = 0; return; }
+      if (previousCycle) position = position / previousCycle * cycle;
+      const count = Math.ceil(wrapper.clientWidth / cycle) + 1;
+      for (let group = 0; group < count; group++) items.forEach((item, index) => {
+        const copy = item.cloneNode(true);
+        // A resize during the entrance must not freeze copies in the hidden state.
+        if (originalStyles[index] === null) copy.removeAttribute('style');
+        else copy.setAttribute('style', originalStyles[index]);
+        copy.setAttribute('aria-hidden', 'true'); copy.setAttribute('inert', '');
+        copy.removeAttribute('id'); copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+        copy.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+        list.append(copy); copies.push(copy);
+      });
+      setX(-position);
+    }
+    const velocity = ST.create({ trigger: wrapper, start: 'top bottom', end: 'bottom top' });
+    function tick(time, delta) {
+      if (!inView || document.hidden || !cycle) return;
+      const dt = Math.min(delta / 1000, 0.064);
+      const configuredSpeed = parseFloat(wrapper.getAttribute('data-cx-marquee-speed'));
+      const base = configuredSpeed > 0 ? configuredSpeed : innerWidth < 768 ? 24 : 34;
+      const target = hovering || focusing ? 0 : base + Math.min(Math.abs(velocity.getVelocity()) * 0.045, 90);
+      speed += (target - speed) * (1 - Math.exp(-dt * 4));
+      position = (position + speed * dt) % cycle; setX(-position);
+    }
+    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; }, { rootMargin: '60px' });
+    observer.observe(wrapper);
+    const resize = new ResizeObserver(measure); resize.observe(wrapper);
+    items.forEach(item => item.querySelectorAll('img').forEach(img => {
+      resize.observe(img); listen(img, 'load', measure);
+    }));
+    listen(wrapper, 'pointerenter', event => { if (event.pointerType !== 'touch') hovering = true; });
+    listen(wrapper, 'pointerleave', () => { hovering = false; });
+    listen(wrapper, 'focusin', () => { focusing = true; });
+    listen(wrapper, 'focusout', event => { focusing = wrapper.contains(event.relatedTarget); });
+    measure(); gsap.ticker.add(tick);
+    const entrance = gsap.from(items, { y: 12, opacity: 0, duration: 0.75, stagger: 0.045,
+      ease: 'power3.out', scrollTrigger: { trigger: wrapper, start: 'top 95%', once: true }, clearProps: 'transform,opacity' });
+    cleanups.push(() => {
+      gsap.ticker.remove(tick); observer.disconnect(); resize.disconnect(); velocity.kill();
+      if (entrance.scrollTrigger) entrance.scrollTrigger.kill(); entrance.kill();
+      copies.forEach(copy => copy.remove()); wrapper.classList.remove('cx-logos-marquee');
+      gsap.set(list, { clearProps: 'transform,translate,rotate,scale' });
+      if (previousStyle === null) list.removeAttribute('style'); else list.setAttribute('style', previousStyle);
+    });
   }
   function floatCard(card, index) {
     if (prepared.has(card) || card.closest('[data-cx-motion="off"]')) return;
