@@ -191,3 +191,14 @@ La ligne automatiquement passée en `.span__greed` conserve explicitement la
 hauteur de ligne du titre. Si Webflow utilise `line-height: normal`, la hauteur
 de la première ligne serif sert de référence. Cette mesure est recalculée par
 SplitText aux changements de largeur et au chargement des polices.
+
+## Système orbital CreativeX
+
+`.system__wrapper` reçoit deux orbites SVG en pointillés et les dix libellés de
+la référence : stratégie, contexte, objectifs, résultats, agences, DAMs, données,
+Gen AI et reporting. Le `.cx__logo` existant reste centré. Les libellés parcourent
+les anneaux sur 140 secondes, en restant horizontaux ; quatorze particules corail
+circulent en 22 secondes avec une opacité pulsée. L’ensemble apparaît en fondu
+au scroll, s’arrête hors écran ou dans un onglet masqué, et reste statique avec
+le mouvement réduit. Le cadrage reste circulaire, même dans un wrapper mobile
+rectangulaire, sans modifier la taille Webflow de la section.

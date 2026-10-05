@@ -154,6 +154,7 @@
     document.querySelectorAll('.section-tabs').forEach(mediaObservability);
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
     document.querySelectorAll('.category-wrapper').forEach(categoryPreview);
+    document.querySelectorAll('.system__wrapper').forEach(systemOrbit);
     if (media.matches) return;
     document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));
     document.querySelectorAll('.nav__dropdown-wrapper').forEach(element => {
@@ -170,6 +171,70 @@
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+  }
+  function systemOrbit(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const logo = wrapper.querySelector('.cx__logo');
+    if (!logo) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-system-orbit');
+    const stage = document.createElement('div'); stage.className = 'cx-system-stage';
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('viewBox', '0 0 1000 1000'); svg.setAttribute('aria-hidden', 'true');
+    [370, 240].forEach(radius => {
+      const circle = document.createElementNS(svg.namespaceURI, 'circle');
+      circle.setAttribute('cx', '500'); circle.setAttribute('cy', '500'); circle.setAttribute('r', String(radius));
+      svg.append(circle);
+    });
+    stage.append(svg); wrapper.prepend(stage);
+    const definitions = [
+      ['BRAND STRATEGY', 0.37, -53, ''], ['GEN AI', 0.37, -20, 'orange'],
+      ['INSIGHTS & REPORTING', 0.37, 33, 'green'], ['OUTCOMES', 0.37, 65, ''],
+      ['COMMERCIAL GOALS', 0.37, 132, ''], ['MEDIA AGENCIES', 0.37, 162, 'blue'],
+      ['DAMS', 0.37, 212, 'pink'], ['CAMPAIGN CONTEXT', 0.24, -115, ''],
+      ['DATA LAKES', 0.24, -172, ''], ['CREATIVE AGENCIES', 0.24, 8, '']
+    ];
+    const nodes = definitions.map(([label, radius, angle, theme]) => {
+      const element = document.createElement('div'); element.className = 'cx-system-node';
+      if (theme) element.classList.add('is-' + theme);
+      else { const dot = document.createElement('span'); dot.className = 'cx-system-dot'; dot.setAttribute('aria-hidden', 'true'); element.append(dot); }
+      const text = document.createElement('span'); text.textContent = label; element.append(text); stage.append(element);
+      return { element, radius, angle };
+    });
+    const particles = Array.from({ length: 14 }, (_, index) => {
+      const element = document.createElement('span'); element.className = 'cx-system-particle';
+      element.setAttribute('aria-hidden', 'true'); stage.append(element);
+      return { element, radius: index % 2 ? 0.24 : 0.37, angle: index * 137.5 };
+    });
+    const state = { outer: 0, inner: 0, signal: 0 };
+    function position(element, radius, degrees) {
+      const angle = degrees * Math.PI / 180;
+      element.style.left = (50 + Math.cos(angle) * radius * 100) + '%';
+      element.style.top = (50 + Math.sin(angle) * radius * 100) + '%';
+    }
+    function render() {
+      nodes.forEach(node => position(node.element, node.radius, node.angle + (node.radius === 0.37 ? state.outer : state.inner)));
+      particles.forEach((particle, index) => {
+        position(particle.element, particle.radius, particle.angle + state.signal * (index % 2 ? -1 : 1));
+        particle.element.style.opacity = String(0.18 + 0.58 * (0.5 + 0.5 * Math.sin((state.signal + index * 35) * Math.PI / 180)));
+      });
+    }
+    render();
+    const loops = media.matches ? [] : [
+      gsap.to(state, { outer: 360, duration: 140, repeat: -1, ease: 'none', paused: true, onUpdate: render }),
+      gsap.to(state, { inner: 360, duration: 140, repeat: -1, ease: 'none', paused: true, onUpdate: render }),
+      gsap.to(state, { signal: 360, duration: 22, repeat: -1, ease: 'none', paused: true, onUpdate: render })
+    ];
+    let inView = false;
+    function visibility() { loops.forEach(loop => loop.paused(!inView || document.hidden)); }
+    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; visibility(); });
+    observer.observe(wrapper); listen(document, 'visibilitychange', visibility);
+    const entrance = media.matches ? null : gsap.from(stage, { autoAlpha: 0, duration: 1.3, ease: 'power3.out',
+      scrollTrigger: { trigger: wrapper, start: 'top 88%', once: true } });
+    cleanups.push(() => {
+      observer.disconnect(); loops.forEach(loop => loop.kill());
+      if (entrance) { if (entrance.scrollTrigger) entrance.scrollTrigger.kill(); entrance.kill(); }
+      stage.remove(); wrapper.classList.remove('cx-system-orbit');
+    });
   }
   function mediaObservability(section) {
     if (prepared.has(section) || section.closest('[data-cx-motion="off"]')) return;
