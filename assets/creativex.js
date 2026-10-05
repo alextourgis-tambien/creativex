@@ -154,6 +154,7 @@
   }
 
   function prepare() {
+    document.querySelectorAll('.testimonials-cms').forEach(testimonialSlider);
     document.querySelectorAll('.section-tabs').forEach(mediaObservability);
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
     document.querySelectorAll('.category-wrapper').forEach(categoryPreview);
@@ -176,6 +177,68 @@
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
+  }
+  function testimonialSlider(cms) {
+    if (prepared.has(cms) || cms.closest('[data-cx-motion="off"]')) return;
+    const list = cms.querySelector('.testimonials-list');
+    const items = list ? Array.from(list.children).filter(item => item.matches('.testimonials-item')) : [];
+    if (!items.length || !cms.querySelector('.button-slider')) return;
+    prepared.add(cms); cms.classList.add('cx-testimonial-slider');
+    let current = 0, busy = false, transition;
+    const saved = [list, ...items, ...cms.querySelectorAll('.button-slider')].map(element => ({
+      element, attributes: ['style', 'aria-hidden', 'inert', 'role', 'tabindex', 'aria-label', 'aria-disabled'].map(name => [name, element.getAttribute(name)])
+    }));
+    const status = document.createElement('div'); status.className = 'cx-algo-sr';
+    status.setAttribute('aria-live', 'polite'); status.setAttribute('aria-atomic', 'true'); cms.append(status);
+    items.forEach((item, index) => {
+      item.style.display = index ? 'none' : '';
+      item.setAttribute('aria-hidden', index ? 'true' : 'false'); item.toggleAttribute('inert', !!index);
+      item.querySelectorAll('.button-slider').forEach(control => {
+        control.setAttribute('role', 'button'); control.setAttribute('tabindex', items.length > 1 ? '0' : '-1');
+        control.setAttribute('aria-label', control.matches('.is-previous') ? 'Témoignage précédent' : 'Témoignage suivant');
+        control.setAttribute('aria-disabled', items.length > 1 ? 'false' : 'true');
+      });
+    });
+    const layers = item => Array.from(item.querySelectorAll('.testimonials-image,.testimonials-top,.testimonials-number,.testimonial-content-p'));
+    function navigate(direction, control) {
+      if (busy || items.length < 2) return;
+      busy = true;
+      const outgoing = items[current], next = (current + direction + items.length) % items.length, incoming = items[next];
+      const restoreFocus = outgoing.contains(document.activeElement);
+      const oldHeight = list.getBoundingClientRect().height;
+      list.style.height = oldHeight + 'px';
+      incoming.style.display = ''; incoming.setAttribute('aria-hidden', 'false'); incoming.removeAttribute('inert');
+      const newHeight = incoming.getBoundingClientRect().height;
+      outgoing.setAttribute('aria-hidden', 'true'); outgoing.setAttribute('inert', '');
+      const enter = layers(incoming), leave = layers(outgoing);
+      gsap.set(enter, { autoAlpha: 0, x: direction * 24, y: 8 });
+      transition = gsap.timeline({ onComplete: () => {
+        outgoing.style.display = 'none'; current = next; busy = false; list.style.height = '';
+        gsap.set([...enter, ...leave], { clearProps: 'opacity,visibility,transform' });
+        status.textContent = 'Témoignage ' + (next + 1) + ' sur ' + items.length;
+        if (restoreFocus) incoming.querySelector(direction < 0 ? '.button-slider.is-previous' : '.button-slider.is-next').focus({ preventScroll: true });
+        ST.refresh();
+      } });
+      const duration = media.matches ? 0 : 0.55;
+      transition.to(leave, { autoAlpha: 0, x: -direction * 18, duration: duration * 0.65, ease: 'power2.inOut' }, 0)
+        .to(enter, { autoAlpha: 1, x: 0, y: 0, duration, stagger: media.matches ? 0 : 0.045, ease: 'power3.out' }, duration * 0.25)
+        .to(list, { height: newHeight, duration, ease: 'power3.inOut' }, 0);
+    }
+    listen(cms, 'click', event => {
+      const control = event.target.closest('.button-slider');
+      if (!control || !cms.contains(control)) return;
+      event.preventDefault(); navigate(control.matches('.is-previous') ? -1 : 1, control);
+    });
+    listen(cms, 'keydown', event => {
+      const control = event.target.closest('.button-slider');
+      if (!control || !['Enter', ' ', 'ArrowLeft', 'ArrowRight'].includes(event.key)) return;
+      event.preventDefault(); navigate(event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : control.matches('.is-previous') ? -1 : 1, control);
+    });
+    cleanups.push(() => {
+      if (transition) transition.kill(); status.remove(); cms.classList.remove('cx-testimonial-slider');
+      items.forEach(item => gsap.set(layers(item), { clearProps: 'opacity,visibility,transform' }));
+      saved.forEach(({ element, attributes }) => attributes.forEach(([name, value]) => value === null ? element.removeAttribute(name) : element.setAttribute(name, value)));
+    });
   }
   function solutionHeroParallax(hero) {
     if (prepared.has(hero) || hero.closest('[data-cx-motion="off"]')) return;

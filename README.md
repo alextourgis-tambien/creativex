@@ -242,3 +242,9 @@ Le hero Solutions anime verticalement `.solutions-h__img-wrapper` et
 `.solution-h__element-wrapper`, avec des déplacements de 70–120px et
 réduits sur mobile. Le débattement est borné à chaque refresh pour garder
 les images hors de la zone `.solution-hero-content`.
+
+Le slider `.testimonials-cms` affiche un seul `.testimonials-item` à la fois.
+La liste CMS doit charger tous les items souhaités (Limit items désactivé),
+en conservant ses filtres et son ordre Webflow. Les boutons `.button-slider.is-previous`
+et `.button-slider.is-next` bouclent dans la liste avec un fondu directionnel ;
+Entrée, Espace et les flèches du clavier sont pris en charge.

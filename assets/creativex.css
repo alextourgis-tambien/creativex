@@ -142,3 +142,10 @@ html.lenis, html.lenis body { height: auto; }
   .cx-algo-percent { font-size: 46px; }
   .cx-algo-spend { font-size: 12px; }
 }
+
+/* One CMS testimonial stays visible; the grid allows a seamless crossfade. */
+.cx-testimonial-slider > .testimonials-list { display: grid; }
+.cx-testimonial-slider > .testimonials-list > .testimonials-item { grid-area: 1 / 1; width: 100%; min-width: 0; }
+.cx-testimonial-slider .button-slider { cursor: pointer; }
+.cx-testimonial-slider .button-slider:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.cx-testimonial-slider .button-slider[aria-disabled="true"] { opacity: .35; cursor: default; }
