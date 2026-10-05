@@ -37,3 +37,11 @@ html.lenis, html.lenis body { height: auto; }
 .images-loop-wrapper:not(.cx-radial) .loop-card { position: relative; top: auto; left: auto; }
 
 .cx-radial-card .card__img { display: block; width: 100%; height: auto; aspect-ratio: 1; object-fit: cover; }
+
+/* Both messages share a stable footprint throughout the sticky sequence. */
+.cx-media-obs .tab-wrapper-title, .cx-media-obs .tab-wrapper-p { display: grid; align-items: start; }
+.cx-media-obs .tab-wrapper-title > .is--media-obs-1,
+.cx-media-obs .tab-wrapper-title > .is--media-obs-2,
+.cx-media-obs .tab-wrapper-p > .is--media-obs-1,
+.cx-media-obs .tab-wrapper-p > .is--media-obs-2 { display: block; grid-area: 1 / 1; }
+.cx-media-obs .text-medium.is--1, .cx-media-obs .text-medium.is--2 { font-variant-numeric: tabular-nums; }

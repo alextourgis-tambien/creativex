@@ -171,3 +171,18 @@ avec un fondu, 24 px de déplacement et un léger scale, décalées de 80 ms.
 À la sortie, les images et flèches disparaissent et les titres retrouvent leur
 opacité. Le focus clavier et le toucher déclenchent aussi l’aperçu ; le mouvement
 réduit conserve l’interaction sans animation. Les liens gardent leur navigation.
+
+## Observabilité des médias — séquence sticky
+
+La `.section-tabs` conserve ses 200vh et son `.tab-wrapper` sticky. Une timeline
+GSAP unique suit le scroll de `top top` à `bottom bottom`, avec `scrub: 0.8`,
+et se joue à l’envers en remontant. Les `.tab-icon-image.is-1` laissent place
+aux `.is-2` avec un fondu, une légère échelle et une propagation par rangée/colonne.
+Les compteurs passent de 16 % à 100 % et de $75K à $55K. L’attribut
+`data-cx-count-to` sur chaque `.text-medium.is--1` / `.is--2` permet de modifier
+la valeur finale sans changer le script. Les tags passent au vert ; la flèche
+observable tourne du bas vers le haut, celle des dépenses du haut vers le bas.
+Au milieu, les titres et paragraphes `.is--media-obs-1` se remplacent par les
+`.is--media-obs-2`, dans une grille superposée qui évite les sauts de hauteur.
+Cette section est exclue des révélations génériques, tout en conservant la
+Greed sur la dernière ligne des titres. Mouvement réduit : état final statique.

@@ -5,7 +5,7 @@
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const titleSelectors = '.title--1,.title--3,.title--2,.title-main,.highligts__title,.text-55-serif-medium,.case__title-main,.nl__title,.contact__title,.report-highligts__title';
   const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]';
-  const exclude = '.section-observability,.section-bussiness,.images-loop-wrapper,[data-cx-motion="off"]';
+  const exclude = '.section-observability,.section-bussiness,.section-tabs,.images-loop-wrapper,[data-cx-motion="off"]';
   const cleanups = [], splits = [], tweens = [];
   const prepared = new Set(), revealed = new WeakSet();
   let gsap, ST, SplitText, ctx, lenis, curtain, ownLenis = false, active = false;
@@ -39,7 +39,7 @@
   function reveal(element) {
     const styledTitle = element.matches(titleSelectors);
     if (styledTitle && element.parentElement.closest(titleSelectors)) return;
-    if (prepared.has(element) || !element.getClientRects().length || getComputedStyle(element).visibility === 'hidden' || (!styledTitle && element.closest(exclude))) return;
+    if (prepared.has(element) || !element.getClientRects().length || (getComputedStyle(element).visibility === 'hidden' && !element.closest('.cx-media-obs')) || (!styledTitle && element.closest(exclude))) return;
     if (element.querySelector('a,button,input,select,textarea,iframe,svg,img')) return;
     prepared.add(element);
     if (element.getBoundingClientRect().bottom < 0) revealed.add(element);
@@ -145,6 +145,7 @@
   }
 
   function prepare() {
+    document.querySelectorAll('.section-tabs').forEach(mediaObservability);
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
     document.querySelectorAll('.category-wrapper').forEach(categoryPreview);
     if (media.matches) return;
@@ -163,6 +164,63 @@
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+  }
+  function mediaObservability(section) {
+    if (prepared.has(section) || section.closest('[data-cx-motion="off"]')) return;
+    const box = section.querySelector('.tab-box');
+    if (!box) return;
+    prepared.add(section); section.classList.add('cx-media-obs');
+    const initialCopy = Array.from(section.querySelectorAll('.title--3.is--media-obs-1,.paragraph.is--media-obs-1'));
+    const finalCopy = Array.from(section.querySelectorAll('.title--3.is--media-obs-2,.paragraph.is--media-obs-2'));
+    const counters = ['.text-medium.is--1', '.text-medium.is--2'].map(selector => box.querySelector(selector));
+    const counterText = counters.map(element => element ? element.textContent : '');
+    const starts = counterText.map(text => Number(text.replace(/[^\d.]/g, '')) || 0);
+    const ends = counters.map((element, index) => {
+      const configured = element && element.getAttribute('data-cx-count-to');
+      return configured !== null && configured !== '' && Number.isFinite(Number(configured)) ? Number(configured) : [100, 55][index];
+    });
+    const state = { progress: 0 };
+    function count() {
+      counters.forEach((element, index) => {
+        if (!element) return;
+        const value = Math.round(starts[index] + (ends[index] - starts[index]) * state.progress);
+        element.textContent = counterText[index].replace(/[\d.,]+/, String(value));
+      });
+    }
+    gsap.set(finalCopy, { autoAlpha: 0, y: 20 });
+    const timeline = gsap.timeline({ paused: true });
+    timeline.fromTo(state, { progress: 0 }, { progress: 1, duration: 0.7, ease: 'sine.inOut', onUpdate: count }, 0.12);
+    Array.from(box.querySelectorAll('.tab-grid-wrapper')).forEach((row, rowIndex) => {
+      Array.from(row.querySelectorAll('.tab-icon')).forEach((cell, columnIndex) => {
+        const before = cell.querySelector('.tab-icon-image.is-1');
+        const after = cell.querySelector('.tab-icon-image.is-2');
+        if (!before || !after) return;
+        gsap.set(after, { display: 'block', autoAlpha: 0, scale: 0.75, y: 5 });
+        const at = 0.14 + rowIndex * 0.024 + Math.max(0, columnIndex - 1) * 0.07;
+        timeline.to(before, { autoAlpha: 0, scale: 0.8, y: -4, duration: 0.12, ease: 'power2.inOut' }, at);
+        timeline.to(after, { autoAlpha: 1, scale: 1, y: 0, duration: 0.18, ease: 'power3.out' }, at + 0.04);
+      });
+    });
+    timeline.to(box.querySelectorAll('.tab-tag'), { backgroundColor: '#baffb2', duration: 0.55, ease: 'sine.inOut' }, 0.22);
+    timeline.to(box.querySelectorAll('.tab-tag .greed-small'), { color: '#0c513d', duration: 0.55, ease: 'sine.inOut' }, 0.22);
+    [1, 2].forEach(index => {
+      timeline.fromTo(box.querySelectorAll('.arrow.is--' + index), { rotation: index === 1 ? 0 : 180 }, {
+        rotation: index === 1 ? 180 : 360, duration: 0.48, ease: 'power2.inOut',
+        filter: 'brightness(0) saturate(100%) invert(23%) sepia(42%) saturate(716%) hue-rotate(113deg) brightness(92%) contrast(94%)'
+      }, 0.25);
+    });
+    timeline.to(initialCopy, { autoAlpha: 0, y: -16, duration: 0.12, ease: 'power2.inOut' }, 0.4);
+    timeline.to(finalCopy, { autoAlpha: 1, y: 0, duration: 0.18, stagger: 0.025, ease: 'power3.out' }, 0.49);
+    timeline.to({}, { duration: 0.18 }, 0.82);
+    let trigger;
+    if (media.matches) timeline.progress(1);
+    else trigger = ST.create({ trigger: section, start: 'top top', end: 'bottom bottom',
+      animation: timeline, scrub: 0.8, invalidateOnRefresh: true });
+    tweens.push(timeline);
+    cleanups.push(() => {
+      if (trigger) trigger.kill(); timeline.kill(); section.classList.remove('cx-media-obs');
+      counters.forEach((element, index) => { if (element) element.textContent = counterText[index]; });
+    });
   }
   function categoryPreview(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
