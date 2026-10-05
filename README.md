@@ -144,7 +144,8 @@ absence de débordement horizontal, panneaux lisibles et fixture mouvement rédu
 avec une rotation tangente. GSAP ScrollTrigger anime leur position de `top bottom`
 à `bottom top`, avec `scrub: 0.9` : défilement à gauche en descendant, retour en
 remontant, arrêt quand le scroll se stabilise. La jonction des copies se fait hors
-champ. L’arc, la hauteur et l’espacement se recalculent sur mobile et au resize.
+champ. La hauteur reste celle d’une rangée de cartes : l’arc est coupé sur les bords
+du cadre, sans agrandir la section. Les mesures se recalculent sur mobile et au resize.
 Les copies sont décoratives (`aria-hidden`, `inert`). Mouvement réduit : rangée native.
 L’ancien script inline home ciblant `.loop-card` et sa CSS ont été remplacés par
 ce module ; les cartes réelles portent la classe `.card`.

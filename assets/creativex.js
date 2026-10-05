@@ -249,9 +249,8 @@
       });
       cards = originals.concat(copies); total = cards.length * spacing;
       setters = cards.map(card => ({ x: gsap.quickSetter(card, 'x', 'px'), y: gsap.quickSetter(card, 'y', 'px'), rotation: gsap.quickSetter(card, 'rotation', 'deg') }));
-      const edge = Math.min(radius * 0.95, width / 2 + cardWidth / 2);
-      const depth = radius - Math.sqrt(radius * radius - edge * edge);
-      track.style.height = Math.ceil(originals[0].offsetHeight + depth + 90) + 'px';
+      // Keep the original one-row footprint: the arc is cropped by the section.
+      track.style.height = Math.ceil(originals[0].offsetHeight) + 'px';
       render();
       clearTimeout(resizeTimer); resizeTimer = setTimeout(() => ST.refresh(), 100);
     }
