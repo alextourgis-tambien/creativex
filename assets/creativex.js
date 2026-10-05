@@ -278,7 +278,7 @@
     if (!items.length) return;
     const originalStyles = items.map(item => item.getAttribute('style'));
     prepared.add(wrapper); wrapper.classList.add('cx-logos-marquee');
-    let copies = [], cycle = 0, position = 0, speed = 0, inView = false, hovering = false, focusing = false;
+    let copies = [], cycle = 0, position = 0, speed = 0, inView = false, focusing = false;
     const previousStyle = list.getAttribute('style');
     const setX = gsap.quickSetter(list, 'x', 'px');
     function measure() {
@@ -308,7 +308,7 @@
       const dt = Math.min(delta / 1000, 0.064);
       const configuredSpeed = parseFloat(wrapper.getAttribute('data-cx-marquee-speed'));
       const base = configuredSpeed > 0 ? configuredSpeed : innerWidth < 768 ? 24 : 34;
-      const target = hovering || focusing ? 0 : base + Math.min(Math.abs(velocity.getVelocity()) * 0.045, 90);
+      const target = focusing ? 0 : base + Math.min(Math.abs(velocity.getVelocity()) * 0.045, 90);
       speed += (target - speed) * (1 - Math.exp(-dt * 4));
       position = (position + speed * dt) % cycle; setX(-position);
     }
@@ -318,8 +318,6 @@
     items.forEach(item => item.querySelectorAll('img').forEach(img => {
       resize.observe(img); listen(img, 'load', measure);
     }));
-    listen(wrapper, 'pointerenter', event => { if (event.pointerType !== 'touch') hovering = true; });
-    listen(wrapper, 'pointerleave', () => { hovering = false; });
     listen(wrapper, 'focusin', () => { focusing = true; });
     listen(wrapper, 'focusout', event => { focusing = wrapper.contains(event.relatedTarget); });
     measure(); gsap.ticker.add(tick);

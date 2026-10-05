@@ -25,7 +25,8 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
   aux accents et descendantes.
 - Logos CMS `.logo-wrapper` / `.logos-list` / `.logos-item` : ruban GSAP sans coupure,
   34 px/s sur desktop et 24 px/s sur mobile, accélération douce liée à la vitesse de scroll.
-  Arrêt progressif au survol ou au focus, reprise amortie, entrée décalée et bords estompés.
+  Défilement continu au survol, arrêt progressif au focus clavier, reprise amortie,
+  entrée décalée et bords estompés.
   Copies décoratives `aria-hidden` et `inert`, largeur recalculée après chargement des images
   et redimensionnement ; pause hors écran ou onglet masqué. Mouvement réduit : liste native.
 - Résultats `.bussines-cards` : apparition des contenus internes à `top 92%`,
