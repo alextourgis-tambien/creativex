@@ -237,3 +237,8 @@ Les éléments de la séquence campagne flottent légèrement en vue, et les poi
 défilent en continu. Ces boucles se mettent en pause hors écran et dans un onglet
 masqué, et sont désactivées en mouvement réduit. Le portrait puis les deux bulles
 apparaissent séparément au début de la timeline de scroll.
+
+Le hero Solutions anime verticalement `.solutions-h__img-wrapper` et
+`.solution-h__element-wrapper`, avec des déplacements limités à 18–32px et
+réduits sur mobile. Le débattement est borné à chaque refresh pour garder
+les images hors de la zone `.solution-hero-content`.

@@ -174,6 +174,40 @@
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+    document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
+  }
+  function solutionHeroParallax(hero) {
+    if (prepared.has(hero) || hero.closest('[data-cx-motion="off"]')) return;
+    const content = hero.querySelector('.solution-hero-content');
+    const images = Array.from(hero.querySelectorAll('.solutions-h__img-wrapper, .solution-h__element-wrapper'));
+    if (!content || !images.length) return;
+    prepared.add(hero);
+    images.forEach((image, index) => {
+      const previous = image.getAttribute('style');
+      const initialY = Number(gsap.getProperty(image, 'y')) || 0;
+      function destination() {
+        const rect = image.getBoundingClientRect(), text = content.getBoundingClientRect();
+        const currentY = Number(gsap.getProperty(image, 'y')) || 0;
+        const top = rect.top - currentY + initialY, bottom = rect.bottom - currentY + initialY;
+        const factor = innerWidth < 768 ? 0.4 : 1;
+        let distance = [18, 32, -24, 22, -20, 26][index % 6] * factor;
+        // Clamp the full travel against the native text area, including on resize.
+        if (rect.right > text.left && rect.left < text.right) {
+          if (top >= text.bottom) distance = Math.max(distance, text.bottom + 14 - top);
+          else if (bottom <= text.top) distance = Math.min(distance, text.top - 14 - bottom);
+          else distance = 0;
+        }
+        return initialY + distance;
+      }
+      const tween = gsap.fromTo(image, { y: initialY }, {
+        y: destination, ease: 'none',
+        scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 1.1, invalidateOnRefresh: true }
+      });
+      cleanups.push(() => {
+        tween.scrollTrigger.kill(); tween.kill();
+        if (previous === null) image.removeAttribute('style'); else image.setAttribute('style', previous);
+      });
+    });
   }
   function campaignDrift(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
