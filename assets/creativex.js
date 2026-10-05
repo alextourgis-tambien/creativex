@@ -439,7 +439,6 @@
     prepared.add(wrapper); wrapper.classList.add('cx-card-tabs');
     const elements = [track, controls, ...pairs.flatMap(pair => [pair.button, pair.card, pair.line].filter(Boolean))];
     const saved = elements.map(element => ({ element, attributes: ['style', 'id', 'role', 'tabindex', 'aria-selected', 'aria-controls', 'aria-labelledby', 'aria-hidden', 'inert'].map(name => [name, element.getAttribute(name)]) }));
-    const initialX = Number(gsap.getProperty(track, 'x')) || 0;
     let active = 0, motion;
     const prefix = 'cx-card-tabs-' + document.querySelectorAll('.cx-card-tabs').length;
     controls.setAttribute('role', 'tablist');
@@ -450,12 +449,9 @@
     });
     const destination = () => {
       const card = pairs[active].card.getBoundingClientRect();
-      if (active === 0 || active === pairs.length - 1) {
-        const viewport = track.parentElement.getBoundingClientRect();
-        const currentX = Number(gsap.getProperty(track, 'x')) || 0;
-        return currentX + viewport.left + viewport.width / 2 - card.left - card.width / 2;
-      }
-      return initialX - (card.left - pairs[0].card.getBoundingClientRect().left);
+      const viewport = track.parentElement.getBoundingClientRect();
+      const currentX = Number(gsap.getProperty(track, 'x')) || 0;
+      return currentX + viewport.left + viewport.width / 2 - card.left - card.width / 2;
     };
     function select(index, instant = false, focus = false) {
       active = index;
