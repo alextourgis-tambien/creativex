@@ -149,3 +149,13 @@ html.lenis, html.lenis body { height: auto; }
 .cx-testimonial-slider .button-slider { cursor: pointer; }
 .cx-testimonial-slider .button-slider:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .cx-testimonial-slider .button-slider[aria-disabled="true"] { opacity: .35; cursor: default; }
+
+.cx-card-tabs .slider-parent { overflow: hidden; }
+.cx-card-tabs .slider-images { will-change: transform; }
+.cx-card-tabs .slider-parent-wrapper { max-width: 100%; }
+.cx-card-tabs .slider-button { cursor: pointer; }
+.cx-card-tabs .slider-button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.cx-card-tabs .slider-button .line { transform-origin: left center; }
+@media (max-width: 767px) {
+  .cx-card-tabs .slider-parent-wrapper { flex-wrap: wrap; justify-content: center; column-gap: 20px; row-gap: 16px; }
+}

@@ -154,6 +154,7 @@
   }
 
   function prepare() {
+    document.querySelectorAll('.slider-tab-wrapper').forEach(cardTabs);
     document.querySelectorAll('.testimonials-cms').forEach(testimonialSlider);
     document.querySelectorAll('.section-tabs').forEach(mediaObservability);
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
@@ -177,6 +178,63 @@
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
+  }
+  function cardTabs(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const track = wrapper.querySelector('.slider-images'), controls = wrapper.querySelector('.slider-parent-wrapper');
+    if (!track || !controls) return;
+    const key = element => Array.from(element.classList).find(name => /^is--[1-5]$/.test(name));
+    const pairs = Array.from(controls.querySelectorAll('.slider-button')).map(button => ({
+      button, card: track.querySelector('.slider-image-card.' + key(button)), line: button.querySelector('.line.' + key(button))
+    })).filter(pair => pair.card);
+    if (!pairs.length) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-card-tabs');
+    const elements = [track, controls, ...pairs.flatMap(pair => [pair.button, pair.card, pair.line].filter(Boolean))];
+    const saved = elements.map(element => ({ element, attributes: ['style', 'id', 'role', 'tabindex', 'aria-selected', 'aria-controls', 'aria-labelledby', 'aria-hidden', 'inert'].map(name => [name, element.getAttribute(name)]) }));
+    const initialX = Number(gsap.getProperty(track, 'x')) || 0;
+    let active = 0, motion;
+    const prefix = 'cx-card-tabs-' + document.querySelectorAll('.cx-card-tabs').length;
+    controls.setAttribute('role', 'tablist');
+    pairs.forEach(({ button, card }, index) => {
+      button.id ||= prefix + '-tab-' + index; card.id ||= prefix + '-panel-' + index;
+      button.setAttribute('role', 'tab'); button.setAttribute('aria-controls', card.id);
+      card.setAttribute('role', 'tabpanel'); card.setAttribute('aria-labelledby', button.id);
+    });
+    const destination = () => initialX - (pairs[active].card.getBoundingClientRect().left - pairs[0].card.getBoundingClientRect().left);
+    function select(index, instant = false, focus = false) {
+      active = index;
+      if (motion) motion.kill();
+      pairs.forEach(({ button, card, line }, i) => {
+        button.setAttribute('aria-selected', String(i === active)); button.setAttribute('tabindex', i === active ? '0' : '-1');
+        card.setAttribute('aria-hidden', String(i !== active)); card.toggleAttribute('inert', i !== active);
+        if (line) gsap.to(line, { scaleX: i === active ? 1 : 0, transformOrigin: 'left center', duration: instant || media.matches ? 0 : 0.55, ease: 'power3.inOut', overwrite: true });
+      });
+      motion = gsap.to(track, { x: destination(), duration: instant || media.matches ? 0 : 0.9, ease: 'power3.inOut', overwrite: true });
+      if (focus) pairs[active].button.focus({ preventScroll: true });
+    }
+    listen(controls, 'click', event => {
+      const index = pairs.findIndex(pair => pair.button === event.target.closest('.slider-button'));
+      if (index >= 0) { event.preventDefault(); select(index); }
+    });
+    listen(controls, 'keydown', event => {
+      const index = pairs.findIndex(pair => pair.button === event.target.closest('.slider-button'));
+      if (index < 0) return;
+      let next = index;
+      if (event.key === 'ArrowRight') next = (index + 1) % pairs.length;
+      else if (event.key === 'ArrowLeft') next = (index - 1 + pairs.length) % pairs.length;
+      else if (event.key === 'Home') next = 0;
+      else if (event.key === 'End') next = pairs.length - 1;
+      else if (!['Enter', ' '].includes(event.key)) return;
+      event.preventDefault(); select(next, false, true);
+    });
+    const resize = new ResizeObserver(() => select(active, true)); resize.observe(wrapper);
+    pairs.forEach(pair => resize.observe(pair.card));
+    select(0, true);
+    cleanups.push(() => {
+      resize.disconnect(); if (motion) motion.kill(); gsap.killTweensOf(pairs.map(pair => pair.line).filter(Boolean));
+      wrapper.classList.remove('cx-card-tabs');
+      saved.forEach(({ element, attributes }) => attributes.forEach(([name, value]) => value === null ? element.removeAttribute(name) : element.setAttribute(name, value)));
+    });
   }
   function testimonialSlider(cms) {
     if (prepared.has(cms) || cms.closest('[data-cx-motion="off"]')) return;

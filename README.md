@@ -248,3 +248,9 @@ La liste CMS doit charger tous les items souhaités (Limit items désactivé),
 en conservant ses filtres et son ordre Webflow. Les boutons `.button-slider.is-previous`
 et `.button-slider.is-next` bouclent dans la liste avec un fondu directionnel ;
 Entrée, Espace et les flèches du clavier sont pris en charge.
+
+Le slider `.slider-tab-wrapper` associe les `.slider-button.is--1` à `.is--5`
+aux cartes `.slider-image-card` portant le même suffixe. Le rail glisse vers
+la carte active et seule sa `.line` est déployée à scaleX:1. Les distances
+sont recalculées au redimensionnement ; la navigation clavier et le mode
+mouvement réduit sont pris en charge.
