@@ -13,11 +13,16 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
 
 - Hero : titres par lignes masquées (1,05 s), paragraphe progressif et CTA légèrement soulevé.
 - Scroll : titres et paragraphes révélés une fois, avec décalage entre les lignes.
-- Boutons `.button` / `.button-text`, `.nav__dropdown-wrapper`, `.navbar-link-text` et
-  `.footer-link` : révélation verticale lettre par lettre au survol et au focus clavier.
-  Deux rangées superposées gardent une boîte stable : durée de 0,55 s par lettre,
-  décalage total plafonné à 0,14 s, courbe `power3.inOut`, retour fluide en sens inverse.
-  Les icônes restent fixes et le masque laisse de la marge aux accents et descendantes.
+- Boutons `.button` / `.button-text` : remplissage circulaire depuis le point d’entrée
+  du pointeur, ouverture GSAP en 0,7 s avec `back.out(1.5)`, fermeture en 0,45 s
+  vers le point de sortie. Le diamètre couvre le coin opposé même depuis un bord.
+  Bleu clair sur fond bleu, bleu pétrole sur fond blanc ou corail ; le texte reste fixe.
+  Le focus clavier ouvre le fond depuis le centre ; les interactions tactiles restent natives.
+- `.nav__dropdown-wrapper`, `.navbar-link-text` et `.footer-link` : révélation verticale
+  lettre par lettre au survol et au focus clavier, sur deux rangées superposées.
+  Durée de 0,55 s par lettre, décalage total plafonné à 0,14 s, courbe `power3.inOut`,
+  retour fluide en sens inverse. Les icônes restent fixes et le masque laisse de la marge
+  aux accents et descendantes.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.
@@ -54,7 +59,8 @@ ne sont pas découpés, et les titres gardent leur nom accessible.
 ## Personnalisation
 
 - `data-cx-reveal` : ajouter une révélation de texte à un élément simple.
-- `data-cx-button` : ajouter le survol à un bouton contenant `.button-text`.
+- `data-cx-button` : ajouter le remplissage directionnel à un bouton contenant `.button-text`.
+- `data-cx-hover-bg` / `data-cx-hover-color` : personnaliser le fond et le texte du bouton au survol.
 - `data-cx-motion="off"` : exclure un composant des nouvelles animations.
 - `data-cx-transition="off"` : garder la navigation native d'un lien.
 - `data-lenis-prevent` : conteneur à défilement indépendant.

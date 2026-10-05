@@ -59,6 +59,7 @@
     const label = textElement || element.querySelector('.button-text');
     if (!label || !label.textContent.trim() || label.querySelector('a,button,input')) return;
     prepared.add(element);
+    if (element.matches('.button,[data-cx-button]')) { directionalButton(element, label); return; }
     const mask = document.createElement('span'); mask.className = 'cx-hover-mask';
     const row = document.createElement('span'); row.className = 'cx-hover-text';
     while (label.firstChild) row.appendChild(label.firstChild);
@@ -83,6 +84,56 @@
       timeline.kill(); original.revert(); incoming.revert();
       while (row.firstChild) label.insertBefore(row.firstChild, mask);
       mask.remove(); label.classList.remove('cx-hover-label');
+    });
+  }
+
+  function directionalButton(element, label) {
+    const clip = document.createElement('span'); clip.className = 'cx-button-fill';
+    const circle = document.createElement('span'); circle.className = 'cx-button-circle';
+    clip.setAttribute('aria-hidden', 'true'); clip.append(circle); element.prepend(clip);
+    element.classList.add('cx-directional-button');
+    const baseColor = getComputedStyle(label).color;
+    const light = element.matches('.button-blue') || (!element.matches('.button-red') && baseColor === 'rgb(255, 255, 255)');
+    const fillColor = element.getAttribute('data-cx-hover-bg') || (light ? '#cfe4fa' : '#003c4f');
+    const textColor = element.getAttribute('data-cx-hover-color') || (light ? '#003c4f' : '#ffffff');
+    circle.style.backgroundColor = fillColor;
+    const previousColor = label.style.color;
+    let hovered = false, focused = false, fillTween, colorTween;
+    gsap.set(circle, { xPercent: -50, yPercent: -50, scale: 0 });
+    function origin(event, animate) {
+      const rect = element.getBoundingClientRect();
+      if (!rect.width || !rect.height) return;
+      const x = event ? Math.max(0, Math.min(rect.width, event.clientX - rect.left)) : rect.width / 2;
+      const y = event ? Math.max(0, Math.min(rect.height, event.clientY - rect.top)) : rect.height / 2;
+      // A circle must cover even the opposite corner when entered at an edge.
+      const diameter = 2 * Math.hypot(Math.max(x, rect.width - x), Math.max(y, rect.height - y)) + 4;
+      const vars = { left: x, top: y, width: diameter, height: diameter };
+      if (animate) gsap.to(circle, { ...vars, duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+      else gsap.set(circle, vars);
+    }
+    function move() {
+      const enter = hovered || focused;
+      if (fillTween) fillTween.kill(); if (colorTween) colorTween.kill();
+      fillTween = gsap.to(circle, { scale: enter ? 1 : 0, duration: enter ? 0.7 : 0.45,
+        ease: enter ? 'back.out(1.5)' : 'power3.inOut', overwrite: 'auto' });
+      colorTween = gsap.to(label, { color: enter ? textColor : baseColor, duration: enter ? 0.3 : 0.4, ease: 'power2.out', overwrite: 'auto' });
+    }
+    listen(element, 'pointerenter', event => {
+      if (event.pointerType === 'touch') return;
+      origin(event, hovered || focused); hovered = true; move();
+    });
+    listen(element, 'pointerleave', event => {
+      hovered = false; if (!focused) origin(event, true); move();
+    });
+    listen(element, 'focus', () => {
+      // Keyboard focus gets a centred fill; clicking must not latch the hover.
+      focused = element.matches(':focus-visible');
+      if (focused) { origin(null, hovered); move(); }
+    });
+    listen(element, 'blur', () => { focused = false; move(); });
+    cleanups.push(() => {
+      gsap.killTweensOf(circle); if (colorTween) colorTween.kill();
+      label.style.color = previousColor; clip.remove(); element.classList.remove('cx-directional-button');
     });
   }
 
