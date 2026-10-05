@@ -186,3 +186,8 @@ Au milieu, les titres et paragraphes `.is--media-obs-1` se remplacent par les
 `.is--media-obs-2`, dans une grille superposée qui évite les sauts de hauteur.
 Cette section est exclue des révélations génériques, tout en conservant la
 Greed sur la dernière ligne des titres. Mouvement réduit : état final statique.
+
+La ligne automatiquement passée en `.span__greed` conserve explicitement la
+hauteur de ligne du titre. Si Webflow utilise `line-height: normal`, la hauteur
+de la première ligne serif sert de référence. Cette mesure est recalculée par
+SplitText aux changements de largeur et au chargement des polices.

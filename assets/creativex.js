@@ -48,7 +48,13 @@
     splits.push(SplitText.create(element, {
       type: 'lines', mask: animate ? 'lines' : undefined, linesClass: 'cx-line', autoSplit: true,
       onSplit(self) {
-        if (styledTitle && self.lines.length > 1) self.lines[self.lines.length - 1].classList.add('span__greed');
+        if (styledTitle && self.lines.length > 1) {
+          const lastLine = self.lines[self.lines.length - 1];
+          const lineHeight = getComputedStyle(element).lineHeight;
+          // Preserve the serif line box, including titles using normal font metrics.
+          lastLine.style.lineHeight = lineHeight === 'normal' ? self.lines[0].getBoundingClientRect().height + 'px' : lineHeight;
+          lastLine.classList.add('span__greed');
+        }
         if (!animate) return;
         if (revealed.has(element)) return gsap.set(self.lines, { yPercent: 0, opacity: 1 });
         const tween = gsap.fromTo(self.lines, { yPercent: title ? 110 : 65, opacity: title ? 1 : 0 }, {
