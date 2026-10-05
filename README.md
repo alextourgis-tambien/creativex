@@ -32,6 +32,11 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
   opacité et déplacement de 20 px sur 0,85 s, décalage de 0,09 s entre logo,
   texte et chiffres (ou photo, citation et signature). Léger décalage entre colonnes.
   Une seule apparition, sans modifier le parallaxe des `.bussines-cards-vertical`.
+- CTA `.cta-wrapper-right > .card` : quatre trajectoires de parallaxe distinctes
+  avec déplacement horizontal discret, montée de 38 à 74 px et petite rotation
+  ajoutée aux angles Webflow. ScrollTrigger de `top bottom` à `bottom top`, `scrub: 1.1`.
+  Amplitude à 55 % sur mobile, retour naturel à la remontée ; chaque instance du CTA
+  possède sa propre animation, sans toucher aux autres `.card` du site.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.

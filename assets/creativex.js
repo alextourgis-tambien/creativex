@@ -153,6 +153,37 @@
     document.querySelectorAll('.logo-wrapper').forEach(logoMarquee);
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
+    document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+  }
+  function ctaCards(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const cards = Array.from(wrapper.children).filter(card => card.matches('.card'));
+    if (!cards.length) return;
+    prepared.add(wrapper);
+    const paths = [
+      { x: [-10, 8], y: [26, -22], rotation: [-2, 2] },
+      { x: [12, -8], y: [36, -28], rotation: [2, -2] },
+      { x: [10, -12], y: [18, -20], rotation: [-2, 2] },
+      { x: [-12, 10], y: [42, -32], rotation: [2.5, -2.5] }
+    ];
+    const factor = () => innerWidth < 768 ? 0.55 : 1;
+    const timeline = gsap.timeline({ scrollTrigger: {
+      trigger: wrapper.closest('.cta-wrapper') || wrapper,
+      start: 'top bottom', end: 'bottom top', scrub: 1.1, invalidateOnRefresh: true
+    } });
+    cards.forEach((card, index) => {
+      const path = paths[index % paths.length];
+      // Retain the rotations designed in Webflow, adding small scroll offsets.
+      const base = { x: Number(gsap.getProperty(card, 'x')) || 0, y: Number(gsap.getProperty(card, 'y')) || 0, rotation: Number(gsap.getProperty(card, 'rotation')) || 0 };
+      timeline.fromTo(card, {
+        x: () => base.x + path.x[0] * factor(), y: () => base.y + path.y[0] * factor(),
+        rotation: () => base.rotation + path.rotation[0] * factor()
+      }, {
+        x: () => base.x + path.x[1] * factor(), y: () => base.y + path.y[1] * factor(),
+        rotation: () => base.rotation + path.rotation[1] * factor(), duration: 1, ease: 'none'
+      }, 0);
+    });
+    tweens.push(timeline); cleanups.push(() => timeline.scrollTrigger.kill());
   }
   function businessReveal(card) {
     if (prepared.has(card) || card.closest('[data-cx-motion="off"]')) return;
