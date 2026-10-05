@@ -1,12 +1,10 @@
 /* Content stays readable before the animation runtime loads. */
 .cx-line-mask, .cx-mask-line-mask { overflow: clip; padding-block: 0.12em; margin-block: -0.12em; }
+/* Two identical text rows share one stable box; only their letters move. */
 .cx-hover-label { position: relative; }
-.cx-hover-text { display: block; }
-.cx-hover-link::after {
-  content: ''; position: absolute; left: 0; right: 0; bottom: -0.35em;
-  height: 1px; background: currentColor; pointer-events: none;
-  transform: scaleX(var(--cx-link-progress, 0)); transform-origin: left center;
-}
+.cx-hover-mask { display: inline-grid; vertical-align: middle; overflow: hidden; padding-block: 0.16em; margin-block: -0.16em; }
+.cx-hover-text { display: block; grid-area: 1 / 1; }
+.cx-hover-copy { pointer-events: none; user-select: none; }
 .obs-card.cx-obs-floating { overflow: visible; }
 .cx-obs-float-layer { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
 .cx-transition, html.cx-entering::before {

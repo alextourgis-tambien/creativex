@@ -59,31 +59,33 @@
     const label = textElement || element.querySelector('.button-text');
     if (!label || !label.textContent.trim() || label.querySelector('a,button,input')) return;
     prepared.add(element);
-    const isButton = element.matches('.button,[data-cx-button]');
+    const mask = document.createElement('span'); mask.className = 'cx-hover-mask';
     const row = document.createElement('span'); row.className = 'cx-hover-text';
     while (label.firstChild) row.appendChild(label.firstChild);
-    label.classList.add('cx-hover-label');
-    if (!isButton) label.classList.add('cx-hover-link');
-    label.append(row);
-    const previousProgress = label.style.getPropertyValue('--cx-link-progress');
-    let tween;
-    function move(enter) {
-      if (tween) tween.kill();
-      tween = isButton
-        ? gsap.to(row, { y: enter ? -1.5 : 0, duration: 0.4, ease: 'power2.out', overwrite: true })
-        : gsap.to(label, { '--cx-link-progress': enter ? 1 : 0, duration: 0.45, ease: 'power2.out', overwrite: true });
-    }
-    listen(element, 'pointerenter', e => { if (e.pointerType !== 'touch') move(true); });
-    listen(element, 'pointerleave', () => { if (!element.matches(':focus-visible')) move(false); });
-    listen(element, 'focus', () => move(true)); listen(element, 'blur', () => move(false));
+    const copy = row.cloneNode(true); copy.classList.add('cx-hover-copy');
+    copy.setAttribute('aria-hidden', 'true');
+    // Keep IDs unique if Webflow supplied styled spans inside the label.
+    copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+    label.classList.add('cx-hover-label'); mask.append(row, copy); label.append(mask);
+    const original = SplitText.create(row, { type: 'words,chars', aria: 'auto' });
+    const incoming = SplitText.create(copy, { type: 'words,chars', aria: 'none' });
+    const stagger = { amount: Math.min(0.14, original.chars.length * 0.009), from: 'start' };
+    const timeline = gsap.timeline({ paused: true, defaults: { duration: 0.55, ease: 'power3.inOut' } })
+      .fromTo(original.chars, { yPercent: 0 }, { yPercent: -145, stagger }, 0)
+      .fromTo(incoming.chars, { yPercent: 145 }, { yPercent: 0, stagger }, 0);
+    let hovered = false, focused = false;
+    function move() { if (hovered || focused) timeline.play(); else timeline.reverse(); }
+    listen(element, 'pointerenter', e => { if (e.pointerType !== 'touch') { hovered = true; move(); } });
+    listen(element, 'pointerleave', () => { hovered = false; move(); });
+    listen(element, 'focus', () => { focused = true; move(); });
+    listen(element, 'blur', () => { focused = false; move(); });
     cleanups.push(() => {
-      if (tween) tween.kill();
-      while (row.firstChild) label.insertBefore(row.firstChild, row);
-      row.remove(); label.classList.remove('cx-hover-label', 'cx-hover-link');
-      if (previousProgress) label.style.setProperty('--cx-link-progress', previousProgress);
-      else label.style.removeProperty('--cx-link-progress');
+      timeline.kill(); original.revert(); incoming.revert();
+      while (row.firstChild) label.insertBefore(row.firstChild, mask);
+      mask.remove(); label.classList.remove('cx-hover-label');
     });
   }
+
   function prepare() {
     document.querySelectorAll('h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]').forEach(reveal);
     document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));

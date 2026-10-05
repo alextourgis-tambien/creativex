@@ -13,9 +13,11 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
 
 - Hero : titres par lignes masquées (1,05 s), paragraphe progressif et CTA légèrement soulevé.
 - Scroll : titres et paragraphes révélés une fois, avec décalage entre les lignes.
-- Boutons `.button` / `.button-text` : soulèvement du texte de 1,5 px, en 0,4 s, au survol et au focus clavier.
-- Soulignement progressif en 0,45 s sur `.nav__dropdown-wrapper`, `.navbar-link-text` et `.footer-link`
-  (libellé `.footer-link-text`), sans déplacer les icônes ni changer les contrôles Webflow.
+- Boutons `.button` / `.button-text`, `.nav__dropdown-wrapper`, `.navbar-link-text` et
+  `.footer-link` : révélation verticale lettre par lettre au survol et au focus clavier.
+  Deux rangées superposées gardent une boîte stable : durée de 0,55 s par lettre,
+  décalage total plafonné à 0,14 s, courbe `power3.inOut`, retour fluide en sens inverse.
+  Les icônes restent fixes et le masque laisse de la marge aux accents et descendantes.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.
@@ -45,8 +47,9 @@ Le nouveau script désactive ses animations, son lissage et ses transitions avec
 `prefers-reduced-motion: reduce`, y compris lors d'un changement de préférence.
 Cette option ne contrôle pas les animations de sections déjà présentes dans Webflow.
 Aucune règle CSS ne masque les textes avant le chargement réussi du runtime.
-Les libellés de liens ne sont pas dupliqués, les textes avec liens/contrôles ne sont
-pas découpés, et les titres gardent leur nom accessible.
+La seconde rangée visuelle des liens est masquée aux lecteurs d’écran (`aria-hidden`),
+la première conserve son nom accessible via SplitText. Les textes avec liens/contrôles
+ne sont pas découpés, et les titres gardent leur nom accessible.
 
 ## Personnalisation
 
