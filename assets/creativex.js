@@ -5,7 +5,7 @@
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const titleSelectors = '.title--1,.title--3,.title--2,.title-main,.highligts__title,.text-55-serif-medium,.case__title-main,.nl__title,.contact__title,.report-highligts__title';
   const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,.text-big,.text-greed-medium-small,.p-big,.text-greed-regular,[data-cx-reveal]';
-  const exclude = '.section-observability,.section-bussiness,.section-tabs,.images-loop-wrapper,[data-cx-motion="off"]';
+  const exclude = '.section-observability,.section-bussiness,.section-tabs,.images-loop-wrapper,.blog-slider,[data-cx-motion="off"]';
   const cleanups = [], splits = [], tweens = [];
   const prepared = new Set(), revealed = new WeakSet();
   let gsap, ST, SplitText, ctx, lenis, curtain, ownLenis = false, active = false;
@@ -156,6 +156,7 @@
   }
 
   function prepare() {
+    document.querySelectorAll('.blog-slider').forEach(blogSlider);
     document.querySelectorAll('.slider-tab-wrapper').forEach(cardTabs);
     document.querySelectorAll('.testimonials-cms').forEach(testimonialSlider);
     document.querySelectorAll('.section-tabs').forEach(mediaObservability);
@@ -182,6 +183,44 @@
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
     document.querySelectorAll('.ver-carousel__wrapper').forEach(verticalCarousel);
     document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
+  }
+  function blogSlider(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const track = wrapper.querySelector('.blog__highlights-collection-list');
+    const items = track ? Array.from(track.children).filter(item => item.classList.contains('w-dyn-item')) : [];
+    const buttons = Array.from(wrapper.querySelectorAll('.button-slider.is-previous,.button-slider.is-next'));
+    if (!items.length || !buttons.length) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-blog-slider');
+    const saved = [track, ...items, ...buttons].map(element => ({ element,
+      attributes: ['style','role','tabindex','aria-label','aria-hidden','aria-disabled','inert'].map(name => [name, element.getAttribute(name)]) }));
+    const initialX = Number(gsap.getProperty(track, 'x')) || 0;
+    let active = 0, motion;
+    buttons.forEach(button => {
+      button.setAttribute('role', 'button'); button.setAttribute('tabindex', '0');
+      button.setAttribute('aria-label', button.classList.contains('is-next') ? 'Article suivant' : 'Article précédent');
+      button.setAttribute('aria-disabled', String(items.length < 2));
+    });
+    function select(index, instant = false) {
+      active = (index + items.length) % items.length;
+      if (motion) motion.kill();
+      const destination = initialX - (items[active].getBoundingClientRect().left - items[0].getBoundingClientRect().left);
+      items.forEach((item, i) => { item.setAttribute('aria-hidden', String(i !== active)); item.toggleAttribute('inert', i !== active); });
+      motion = gsap.to(track, { x: destination, duration: instant || media.matches ? 0 : .9, ease: 'power3.inOut', overwrite: true });
+    }
+    function navigate(event) {
+      const button = event.target.closest('.button-slider');
+      if (!buttons.includes(button)) return;
+      if (event.type === 'keydown' && !['Enter',' '].includes(event.key)) return;
+      event.preventDefault();
+      if (items.length > 1) select(active + (button.classList.contains('is-next') ? 1 : -1));
+    }
+    listen(wrapper, 'click', navigate); listen(wrapper, 'keydown', navigate);
+    const resize = new ResizeObserver(() => select(active, true)); resize.observe(wrapper);
+    items.forEach(item => resize.observe(item)); select(0, true);
+    cleanups.push(() => {
+      resize.disconnect(); if (motion) motion.kill(); wrapper.classList.remove('cx-blog-slider');
+      saved.forEach(({element,attributes}) => attributes.forEach(([name,value]) => value === null ? element.removeAttribute(name) : element.setAttribute(name,value)));
+    });
   }
   function verticalCarousel(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;

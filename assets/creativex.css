@@ -156,6 +156,11 @@ html.lenis, html.lenis body { height: auto; }
 .cx-card-tabs .slider-button { cursor: pointer; }
 .cx-card-tabs .slider-button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .cx-card-tabs .slider-button .line { transform-origin: left center; }
+.cx-blog-slider .blog__highlights-collection { overflow: clip; }
+.cx-blog-slider .blog__highlights-collection-list { will-change: transform; }
+.cx-blog-slider .button-slider { cursor: pointer; }
+.cx-blog-slider .button-slider:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+.cx-blog-slider .button-slider[aria-disabled="true"] { opacity: .35; cursor: default; }
 .cx-ver-carousel { position: relative; isolation: isolate; overflow: clip; }
 .cx-ver-carousel .ver-carousel__img-wrapper { z-index: 0; overflow: visible; }
 .cx-ver-carousel .ver-carousel__logo-wrapper { position: relative; z-index: 2; }
