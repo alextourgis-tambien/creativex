@@ -156,6 +156,7 @@
   }
 
   function prepare() {
+    document.querySelectorAll('.filter').forEach(collectionFilter);
     document.querySelectorAll('.blog-slider').forEach(blogSlider);
     document.querySelectorAll('.slider-tab-wrapper').forEach(cardTabs);
     document.querySelectorAll('.testimonials-cms').forEach(testimonialSlider);
@@ -183,6 +184,75 @@
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
     document.querySelectorAll('.ver-carousel__wrapper').forEach(verticalCarousel);
     document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
+  }
+  function collectionFilter(filter) {
+    if (prepared.has(filter) || filter.closest('[data-cx-motion="off"]')) return;
+    let scope = filter.parentElement;
+    while (scope && !scope.querySelector('.articles-list,.case__collection-list')) scope = scope.parentElement;
+    const list = scope && scope.querySelector('.articles-list,.case__collection-list');
+    const nav = filter.querySelector('.filter__nav');
+    const options = Array.from(filter.querySelectorAll('.filter__text-wrapper'));
+    if (!list || !nav || !options.length) return;
+    prepared.add(filter); filter.classList.add('cx-collection-filter');
+    const normalize = value => value.trim().normalize('NFKC').toLocaleLowerCase();
+    const items = Array.from(list.children).filter(item => item.classList.contains('w-dyn-item'));
+    const saved = [list,...items,...options].map(element => ({ element,
+      attributes: ['style','role','tabindex','aria-pressed','aria-hidden','inert','data-filter-status'].map(name => [name,element.getAttribute(name)]) }));
+    const label = filter.querySelector('.filter__toggle .filter__text'), originalLabel = label?.textContent;
+    const all = document.createElement('button'); all.type = 'button'; all.className = 'cx-filter-all filter__text-wrapper'; all.textContent = 'All';
+    nav.prepend(all);
+    const empty = document.createElement('p'); empty.className = 'cx-filter-empty'; empty.textContent = 'No results in this category.'; empty.hidden = true; empty.setAttribute('role','status'); list.after(empty);
+    const status = document.createElement('span'); status.className = 'cx-algo-sr'; status.setAttribute('role','status'); list.after(status);
+    const seen = new Set(), buttons = [all];
+    options.forEach(option => {
+      const key = normalize(option.textContent);
+      if (seen.has(key)) { option.style.display = 'none'; return; }
+      seen.add(key); buttons.push(option);
+      option.setAttribute('role','button'); option.setAttribute('tabindex','0');
+    });
+    const categories = item => {
+      const metadata = item.querySelector('.cx-filter-meta');
+      if (metadata) return Array.from(metadata.querySelectorAll('.w-dyn-item')).map(tag => normalize(tag.textContent));
+      return Array.from(item.querySelectorAll('[data-filter-name],.button-secondary-radius .button-text,.category-tag,.text-tag'))
+        .map(tag => normalize(tag.getAttribute('data-filter-name') || tag.textContent));
+    };
+    let active = 'all', motion;
+    function select(button, instant = false) {
+      const target = button === all ? 'all' : normalize(button.textContent);
+      if (!instant && target === active) return;
+      active = target; if (motion) motion.kill();
+      buttons.forEach(b => { const selected = b === button; b.setAttribute('aria-pressed',String(selected)); b.setAttribute('data-filter-status',selected ? 'active' : 'not-active'); });
+      if (label) label.textContent = target === 'all' ? originalLabel : button.textContent.trim();
+      const visible = items.filter(item => getComputedStyle(item).display !== 'none');
+      const matched = items.filter(item => target === 'all' || categories(item).includes(target));
+      const duration = instant || media.matches ? 0 : .2;
+      motion = gsap.timeline();
+      motion.to(visible, { opacity: 0, y: -6, scale: .985, duration, ease:'power2.out' });
+      motion.add(() => {
+        items.forEach(item => { const show = matched.includes(item);
+          const originalStyle = saved.find(entry => entry.element === item).attributes.find(([name]) => name === 'style')[1];
+          if (originalStyle === null) item.removeAttribute('style'); else item.setAttribute('style',originalStyle);
+          if (!show) item.style.display = 'none';
+          item.setAttribute('aria-hidden',String(!show)); item.toggleAttribute('inert',!show);
+        });
+        empty.hidden = matched.length !== 0;
+        status.textContent = matched.length + (matched.length === 1 ? ' result' : ' results');
+        gsap.set(matched,{opacity:0,y:12,scale:.985});
+      });
+      motion.to(matched,{opacity:1,y:0,scale:1,duration:duration ? .4 : 0,stagger:duration ? .035 : 0,ease:'power3.out',onComplete:()=>{ gsap.set(matched,{clearProps:'opacity,transform'}); ST.refresh(); }});
+    }
+    function activate(event) {
+      const button = event.target.closest('.filter__text-wrapper');
+      if (!buttons.includes(button)) return;
+      if (event.type === 'keydown' && !['Enter',' '].includes(event.key)) return;
+      event.preventDefault(); select(button);
+    }
+    listen(nav,'click',activate); listen(nav,'keydown',activate);
+    buttons.forEach(button => { button.setAttribute('aria-pressed',String(button === all)); button.setAttribute('data-filter-status',button === all ? 'active' : 'not-active'); });
+    cleanups.push(()=>{
+      if (motion) motion.kill(); all.remove(); empty.remove(); status.remove(); filter.classList.remove('cx-collection-filter'); if (label) label.textContent = originalLabel;
+      saved.forEach(({element,attributes})=>attributes.forEach(([name,value])=>value === null ? element.removeAttribute(name) : element.setAttribute(name,value)));
+    });
   }
   function blogSlider(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
