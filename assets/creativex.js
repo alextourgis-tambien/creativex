@@ -253,7 +253,15 @@
       button.setAttribute('role', 'tab'); button.setAttribute('aria-controls', card.id);
       card.setAttribute('role', 'tabpanel'); card.setAttribute('aria-labelledby', button.id);
     });
-    const destination = () => initialX - (pairs[active].card.getBoundingClientRect().left - pairs[0].card.getBoundingClientRect().left);
+    const destination = () => {
+      const card = pairs[active].card.getBoundingClientRect();
+      if (active === 0 || active === pairs.length - 1) {
+        const viewport = track.parentElement.getBoundingClientRect();
+        const currentX = Number(gsap.getProperty(track, 'x')) || 0;
+        return currentX + viewport.left + viewport.width / 2 - card.left - card.width / 2;
+      }
+      return initialX - (card.left - pairs[0].card.getBoundingClientRect().left);
+    };
     function select(index, instant = false, focus = false) {
       active = index;
       if (motion) motion.kill();
