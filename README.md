@@ -66,5 +66,9 @@ et navigation entre deux pages de test. Fixtures : mouvement réduit et SplitTex
 indisponible (contenu conservé, navigation native).
 
 Les transitions seront à vérifier sur les véritables autres pages quand leurs
-liens seront renseignés. Les nouveaux scripts doivent également être contrôlés
-sur la préproduction après publication.
+liens seront renseignés.
+
+Le 5 octobre 2026, les snippets ont été installés dans les blocs head/footer du
+site et publiés sur le sous-domaine Webflow. Vérification sur la préproduction :
+asset figé chargé, Lenis actif, neuf boutons préparés, révélations au scroll
+actives et aucune erreur console.
