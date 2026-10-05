@@ -4,7 +4,7 @@
   if (window.CreativeX) return;
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const titleSelectors = '.title--1,.title--3,.title--2,.title-main,.highligts__title,.text-55-serif-medium,.case__title-main,.nl__title,.contact__title,.report-highligts__title';
-  const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]';
+  const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,.text-big,.text-greed-medium-small,.p-big,.text-greed-regular,[data-cx-reveal]';
   const exclude = '.section-observability,.section-bussiness,.section-tabs,.images-loop-wrapper,[data-cx-motion="off"]';
   const cleanups = [], splits = [], tweens = [];
   const prepared = new Set(), revealed = new WeakSet();
@@ -39,6 +39,7 @@
   function reveal(element) {
     const styledTitle = element.matches(titleSelectors);
     if (styledTitle && element.parentElement.closest(titleSelectors)) return;
+    if (!styledTitle && element.parentElement.closest(revealSelectors + ',a,button')) return;
     if (prepared.has(element) || !element.getClientRects().length || (getComputedStyle(element).visibility === 'hidden' && !element.closest('.cx-media-obs')) || (!styledTitle && element.closest(exclude))) return;
     if (element.querySelector('a,button,input,select,textarea,iframe,svg,img')) return;
     prepared.add(element);
