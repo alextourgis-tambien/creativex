@@ -59,6 +59,9 @@
     const label = element.querySelector('.button-text');
     if (!label || !label.textContent.trim() || label.querySelector('a,button,input')) return;
     prepared.add(element);
+    const leading = getComputedStyle(label).lineHeight;
+    const previousLeading = label.style.getPropertyValue('--cx-original-leading');
+    label.style.setProperty('--cx-original-leading', leading === 'normal' ? '1.4em' : leading);
     const row = document.createElement('span'); row.className = 'cx-button-row';
     while (label.firstChild) row.appendChild(label.firstChild);
     const copy = row.cloneNode(true);
@@ -68,7 +71,8 @@
     let tween;
     function move(enter) {
       if (tween) tween.kill();
-      tween = gsap.to([row, copy], { yPercent: enter ? -100 : 0, duration: 0.45, ease: 'power3.out', overwrite: true });
+      const distance = row.getBoundingClientRect().height + parseFloat(getComputedStyle(label).fontSize) * 0.35;
+      tween = gsap.to([row, copy], { y: enter ? -distance : 0, duration: 0.45, ease: 'power3.out', overwrite: true });
     }
     listen(element, 'pointerenter', e => { if (e.pointerType !== 'touch') move(true); });
     listen(element, 'pointerleave', () => { if (!element.matches(':focus-visible')) move(false); });
@@ -77,6 +81,8 @@
       if (tween) tween.kill(); copy.remove();
       while (row.firstChild) label.insertBefore(row.firstChild, row);
       row.remove(); label.classList.remove('cx-button-label');
+      if (previousLeading) label.style.setProperty('--cx-original-leading', previousLeading);
+      else label.style.removeProperty('--cx-original-leading');
     });
   }
   function prepare() {

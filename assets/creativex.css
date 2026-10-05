@@ -1,8 +1,12 @@
 /* Content stays readable before the animation runtime loads. */
 .cx-line-mask, .cx-mask-line-mask { overflow: clip; padding-block: 0.12em; margin-block: -0.12em; }
-.cx-button-label { position: relative; overflow: hidden; }
+.cx-button-label {
+  position: relative; overflow: hidden; line-height: 1.4;
+  /* Expand the clipping area into the button padding without changing its size. */
+  margin-block: calc((var(--cx-original-leading, 1.4em) - 1.4em) / 2);
+}
 .cx-button-row { display: block; }
-.cx-button-copy { position: absolute; top: 100%; left: 0; width: 100%; }
+.cx-button-copy { position: absolute; top: calc(100% + 0.35em); left: 0; width: 100%; }
 .cx-transition, html.cx-entering::before {
   position: fixed; inset: 0; z-index: 2147483000;
   background: #063b48; pointer-events: none;
