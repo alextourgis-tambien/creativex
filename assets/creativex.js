@@ -186,6 +186,14 @@
     document.querySelectorAll('.ver-carousel__wrapper').forEach(verticalCarousel);
     document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
     document.querySelectorAll('.h-about__img-parent').forEach(aboutHeroParallax);
+    document.querySelectorAll('.img__ai').forEach(element => marketingParallax(element, 'y', -100));
+    document.querySelectorAll('.marketing__dash.is--1,.marketing__dash.is--2,.marketing__dash.is--3').forEach(element => {
+      const distance = element.classList.contains('is--1') ? -90 : element.classList.contains('is--2') ? 65 : -120;
+      marketingParallax(element, 'y', distance);
+    });
+    document.querySelectorAll('.logo__slider.is--1,.logo__slider.is--2,.logo__slider.is--3').forEach(element => {
+      marketingParallax(element, 'x', element.classList.contains('is--2') ? 150 : -150);
+    });
   }
   function collectionFilter(filter) {
     if (prepared.has(filter) || filter.closest('[data-cx-motion="off"]')) return;
@@ -363,6 +371,22 @@
       });
     });
     cleanups.push(() => { timeline.scrollTrigger.kill(); timeline.kill(); wrapper.classList.remove('cx-ver-carousel'); });
+  }
+  function marketingParallax(element, axis, distance) {
+    if (prepared.has(element) || element.closest('[data-cx-motion="off"]')) return;
+    prepared.add(element);
+    const previous = element.getAttribute('style');
+    const initial = Number(gsap.getProperty(element, axis)) || 0;
+    const trigger = element.closest('.marketing-image') || element.parentElement;
+    const tween = gsap.fromTo(element, { [axis]: initial }, {
+      [axis]: () => initial + distance * (innerWidth < 768 ? .45 : 1),
+      ease: 'none',
+      scrollTrigger: { trigger, start: 'top bottom', end: 'bottom top', scrub: 1.1, invalidateOnRefresh: true }
+    });
+    cleanups.push(() => {
+      tween.scrollTrigger.kill(); tween.kill();
+      if (previous === null) element.removeAttribute('style'); else element.setAttribute('style', previous);
+    });
   }
   function aboutHeroParallax(image) {
     const variant = Array.from(image.classList).find(name => /^is--[1-9]$/.test(name));
