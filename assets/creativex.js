@@ -199,6 +199,7 @@
       const element = document.createElement('div'); element.className = 'cx-system-node';
       if (theme) element.classList.add('is-' + theme);
       else { const dot = document.createElement('span'); dot.className = 'cx-system-dot'; dot.setAttribute('aria-hidden', 'true'); element.append(dot); }
+      if (label === 'OUTCOMES' || label === 'DATA LAKES') element.classList.add('cx-label-left');
       const text = document.createElement('span'); text.textContent = label; element.append(text); stage.append(element);
       return { element, radius, angle };
     });
@@ -207,33 +208,44 @@
       element.setAttribute('aria-hidden', 'true'); stage.append(element);
       return { element, radius: index % 2 ? 0.24 : 0.37, angle: index * 137.5 };
     });
-    const state = { outer: 0, inner: 0, signal: 0 };
-    function position(element, radius, degrees) {
+    // Anchor the dot, not the combined width of the dot and its label.
+    const moving = [...nodes, ...particles];
+    moving.forEach(item => {
+      gsap.set(item.element, { xPercent: -50, yPercent: -50, force3D: true });
+      item.setX = gsap.quickSetter(item.element, 'x', 'px');
+      item.setY = gsap.quickSetter(item.element, 'y', 'px');
+    });
+    let size = stage.getBoundingClientRect().width, orbit = 0, signal = 0, inView = false;
+    function position(item, degrees) {
       const angle = degrees * Math.PI / 180;
-      element.style.left = (50 + Math.cos(angle) * radius * 100) + '%';
-      element.style.top = (50 + Math.sin(angle) * radius * 100) + '%';
+      item.setX(Math.cos(angle) * item.radius * size);
+      item.setY(Math.sin(angle) * item.radius * size);
     }
     function render() {
-      nodes.forEach(node => position(node.element, node.radius, node.angle + (node.radius === 0.37 ? state.outer : state.inner)));
+      nodes.forEach(node => position(node, node.angle + orbit));
       particles.forEach((particle, index) => {
-        position(particle.element, particle.radius, particle.angle + state.signal * (index % 2 ? -1 : 1));
-        particle.element.style.opacity = String(0.18 + 0.58 * (0.5 + 0.5 * Math.sin((state.signal + index * 35) * Math.PI / 180)));
+        position(particle, particle.angle + signal * (index % 2 ? -1 : 1));
+        particle.element.style.opacity = String(0.18 + 0.58 * (0.5 + 0.5 * Math.sin((signal + index * 35) * Math.PI / 180)));
       });
     }
     render();
-    const loops = media.matches ? [] : [
-      gsap.to(state, { outer: 360, duration: 140, repeat: -1, ease: 'none', paused: true, onUpdate: render }),
-      gsap.to(state, { inner: 360, duration: 140, repeat: -1, ease: 'none', paused: true, onUpdate: render }),
-      gsap.to(state, { signal: 360, duration: 22, repeat: -1, ease: 'none', paused: true, onUpdate: render })
-    ];
-    let inView = false;
-    function visibility() { loops.forEach(loop => loop.paused(!inView || document.hidden)); }
-    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; visibility(); });
-    observer.observe(wrapper); listen(document, 'visibilitychange', visibility);
+    // One transform-only render per frame; no left/top layout or repeat reset.
+    function tick(time, deltaTime) {
+      if (!inView || document.hidden) return;
+      const delta = Math.min(deltaTime / 1000, 0.064);
+      orbit = (orbit + delta * 360 / 140) % 360;
+      signal = (signal + delta * 360 / 22) % 360;
+      render();
+    }
+    if (!media.matches) gsap.ticker.add(tick);
+    const resize = new ResizeObserver(() => { size = stage.getBoundingClientRect().width; render(); });
+    resize.observe(stage);
+    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; });
+    observer.observe(wrapper);
     const entrance = media.matches ? null : gsap.from(stage, { autoAlpha: 0, duration: 1.3, ease: 'power3.out',
       scrollTrigger: { trigger: wrapper, start: 'top 88%', once: true } });
     cleanups.push(() => {
-      observer.disconnect(); loops.forEach(loop => loop.kill());
+      observer.disconnect(); resize.disconnect(); gsap.ticker.remove(tick);
       if (entrance) { if (entrance.scrollTrigger) entrance.scrollTrigger.kill(); entrance.kill(); }
       stage.remove(); wrapper.classList.remove('cx-system-orbit');
     });
