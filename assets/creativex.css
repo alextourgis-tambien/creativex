@@ -7,6 +7,8 @@
   height: 1px; background: currentColor; pointer-events: none;
   transform: scaleX(var(--cx-link-progress, 0)); transform-origin: left center;
 }
+.obs-card.cx-obs-floating { overflow: visible; }
+.cx-obs-float-layer { position: absolute; inset: 0; overflow: hidden; border-radius: inherit; }
 .cx-transition, html.cx-entering::before {
   position: fixed; inset: 0; z-index: 2147483000;
   background: #063b48; pointer-events: none;

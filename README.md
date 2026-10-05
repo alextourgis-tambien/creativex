@@ -26,6 +26,12 @@ Les grandes séquences restent à travailler ensemble. Les animations existantes
 sections `.section-observability`, `.section-bussiness` et `.images-loop-wrapper`
 sont conservées et exclues des nouvelles révélations de texte.
 
+Les `.obs-card` flottent en continu : déplacement vertical de 6 à 13 px, légère
+dérive horizontale et oscillation de 0,9 degré. Chaque carte a une phase et une
+durée différentes. Les trois états d'image sont déplacés ensemble dans un calque
+interne ; le conteneur conserve sa trajectoire GSAP au scroll. Les boucles sont
+en pause hors écran et dans un onglet masqué, et désactivées avec mouvement réduit.
+
 La majorité des liens du site sont actuellement `href="#"` : ils gardent leur
 comportement natif. Les transitions se déclenchent quand de vrais liens internes
 vers d'autres pages sont renseignés. Les liens externes, téléchargements et nouveaux

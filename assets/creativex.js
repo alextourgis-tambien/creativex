@@ -96,6 +96,31 @@
     document.querySelectorAll('.footer-link').forEach(element => {
       button(element, element.querySelector('.footer-link-text') || element);
     });
+    document.querySelectorAll('.obs-card').forEach(floatCard);
+  }
+  function floatCard(card, index) {
+    if (prepared.has(card) || card.closest('[data-cx-motion="off"]')) return;
+    prepared.add(card);
+    // Keep the scroll timeline on the card; float all image states together inside it.
+    const layer = document.createElement('div'); layer.className = 'cx-obs-float-layer';
+    while (card.firstChild) layer.appendChild(card.firstChild);
+    card.appendChild(layer); card.classList.add('cx-obs-floating');
+    const amplitude = () => (innerWidth < 768 ? 6 : 10) + index % 3 * 1.5;
+    const loops = [
+      gsap.fromTo(layer, { y: () => -amplitude() }, { y: amplitude, duration: 3.6 + index * 0.27, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+      gsap.fromTo(layer, { x: -3 }, { x: 3, duration: 5.2 + index * 0.31, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true }),
+      gsap.fromTo(layer, { rotation: -0.9 }, { rotation: 0.9, duration: 4.6 + index * 0.23, repeat: -1, yoyo: true, ease: 'sine.inOut', paused: true })
+    ];
+    loops.forEach((loop, axis) => loop.progress((index * 0.17 + axis * 0.23) % 1));
+    let inView = false;
+    function state() { loops.forEach(loop => loop.paused(!inView || document.hidden)); }
+    const observer = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; state(); }, { rootMargin: '70px' });
+    observer.observe(card); listen(document, 'visibilitychange', state);
+    cleanups.push(() => {
+      observer.disconnect(); loops.forEach(loop => loop.kill());
+      while (layer.firstChild) card.insertBefore(layer.firstChild, layer);
+      layer.remove(); card.classList.remove('cx-obs-floating');
+    });
   }
   function clearEntry() {
     document.documentElement.classList.remove('cx-entering'); clearTimeout(window.cxEntryFallback);
