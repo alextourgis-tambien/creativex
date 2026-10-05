@@ -37,6 +37,8 @@
     });
   }
   function reveal(element) {
+    // Hidden FAQ answers must keep their native markup when the dropdown opens.
+    if (element.matches('.paragraph') && element.closest('.faq__dropdown')) return;
     const styledTitle = element.matches(titleSelectors);
     if (styledTitle && element.parentElement.closest(titleSelectors)) return;
     if (!styledTitle && element.parentElement.closest(revealSelectors + ',a,button')) return;
