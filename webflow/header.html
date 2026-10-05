@@ -1,0 +1,16 @@
+<!-- Webflow: Site settings → Custom code → Head code -->
+<script>
+(function () {
+  try {
+    var next = sessionStorage.getItem('cx-next-page');
+    sessionStorage.removeItem('cx-next-page');
+    if (next === location.href && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.documentElement.classList.add('cx-entering');
+      window.cxEntryFallback = setTimeout(function () {
+        document.documentElement.classList.remove('cx-entering');
+      }, 4000);
+    }
+  } catch (_) {}
+})();
+</script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alextourgis-tambien/creativex@main/assets/creativex.css">
