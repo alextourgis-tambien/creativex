@@ -159,3 +159,15 @@ uniquement quand SplitText détecte plusieurs lignes. Recalcul automatique au re
 et au chargement des polices. Les spans déjà stylés dans Webflow sont conservés ;
 les titres imbriqués ne sont pas découpés une seconde fois. Ce traitement typographique
 reste actif avec mouvement réduit, sans animation, Lenis ni transition.
+
+## Aperçu des catégories
+
+Dans `.category-wrapper`, le survol ou le focus d’une `.cat__wrapper` affiche
+la photo `.image-3` de son item CMS dans `.category-image-1`. Le second visuel
+`.category-image-2` conserve l’image commune du panneau ; un second visuel placé
+dans l’item CMS sera utilisé en priorité. Les autres `.category-text` passent à
+35 % d’opacité et seule la `.category-arrow` active apparaît. Les images entrent
+avec un fondu, 24 px de déplacement et un léger scale, décalées de 80 ms.
+À la sortie, les images et flèches disparaissent et les titres retrouvent leur
+opacité. Le focus clavier et le toucher déclenchent aussi l’aperçu ; le mouvement
+réduit conserve l’interaction sans animation. Les liens gardent leur navigation.

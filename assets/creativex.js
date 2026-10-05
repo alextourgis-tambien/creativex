@@ -146,6 +146,7 @@
 
   function prepare() {
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
+    document.querySelectorAll('.category-wrapper').forEach(categoryPreview);
     if (media.matches) return;
     document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));
     document.querySelectorAll('.nav__dropdown-wrapper').forEach(element => {
@@ -162,6 +163,71 @@
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+  }
+  function categoryPreview(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const items = Array.from(wrapper.querySelectorAll('.category-item'));
+    const images = Array.from(wrapper.querySelectorAll('.category-item-image .category-image-1,.category-item-image .category-image-2'));
+    if (!items.length || !images.length) return;
+    prepared.add(wrapper);
+    const links = items.map(item => item.querySelector('.cat__wrapper') || item);
+    const labels = items.map(item => item.querySelector('.category-text'));
+    const arrows = items.map(item => item.querySelector('.category-arrow'));
+    const elements = images.concat(labels, arrows).filter(Boolean);
+    const saved = elements.map(element => ({ element, style: element.getAttribute('style'),
+      attrs: ['src', 'srcset', 'sizes', 'alt'].map(name => [name, element.getAttribute(name)]) }));
+    const sources = items.map(item => [item.querySelector('.category-image-1,.image-3'), item.querySelector('.category-image-2')]);
+    const baseImages = images.map(image => image.cloneNode(false));
+    const preloads = sources.flat().filter(Boolean).map(source => {
+      const image = new Image(); image.src = source.getAttribute('src'); return image;
+    });
+    let hovered = -1, focused = -1, current = -1, sequence;
+    const duration = value => media.matches ? 0 : value;
+    gsap.set(images, { autoAlpha: 0, y: 24, scale: 0.97, pointerEvents: 'none' });
+    gsap.set(arrows.filter(Boolean), { autoAlpha: 0, x: -8, scale: 0.8 });
+    function update() {
+      const next = hovered >= 0 ? hovered : focused;
+      if (next === current) return;
+      current = next;
+      labels.forEach((label, index) => {
+        if (label) gsap.to(label, { opacity: next < 0 || next === index ? 1 : 0.35,
+          duration: duration(0.3), ease: 'power2.out', overwrite: true });
+      });
+      arrows.forEach((arrow, index) => {
+        if (arrow) gsap.to(arrow, { autoAlpha: next === index ? 1 : 0, x: next === index ? 0 : -8,
+          scale: next === index ? 1 : 0.8, duration: duration(0.4), ease: 'power3.out', overwrite: true });
+      });
+      if (sequence) sequence.kill();
+      sequence = gsap.timeline();
+      sequence.to(images, { autoAlpha: 0, y: -10, duration: duration(0.16), ease: 'power2.in' });
+      if (next < 0) return;
+      sequence.call(() => {
+        images.forEach((image, index) => {
+          const source = sources[next][index] || baseImages[index];
+          ['src', 'srcset', 'sizes', 'alt'].forEach(name => {
+            const value = source.getAttribute(name);
+            if (value === null) image.removeAttribute(name); else image.setAttribute(name, value);
+          });
+        });
+      });
+      sequence.fromTo(images, { autoAlpha: 0, y: 24, scale: 0.97 }, {
+        autoAlpha: 1, y: 0, scale: 1, duration: duration(0.65), stagger: duration(0.08), ease: 'power3.out'
+      });
+    }
+    links.forEach((link, index) => {
+      listen(link, 'pointerenter', event => { if (event.pointerType !== 'touch') { hovered = index; update(); } });
+      listen(link, 'pointerleave', () => { if (hovered === index) { hovered = -1; update(); } });
+      listen(link, 'focusin', () => { focused = index; update(); });
+      listen(link, 'focusout', () => { if (focused === index) { focused = -1; update(); } });
+      listen(link, 'pointerdown', event => { if (event.pointerType === 'touch') { focused = index; update(); } });
+    });
+    cleanups.push(() => {
+      if (sequence) sequence.kill(); gsap.killTweensOf(elements); preloads.length = 0;
+      saved.forEach(({ element, style, attrs }) => {
+        if (style === null) element.removeAttribute('style'); else element.setAttribute('style', style);
+        attrs.forEach(([name, value]) => { if (value === null) element.removeAttribute(name); else element.setAttribute(name, value); });
+      });
+    });
   }
   function ctaCards(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
