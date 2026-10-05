@@ -391,12 +391,12 @@
     });
   }
   function aboutHeroParallax(image) {
-    const variant = Array.from(image.classList).find(name => /^is--[1-9]$/.test(name));
+    const variant = Array.from(image.classList).find(name => /^is--(?:[1-9]|[1-6]--cs)$/.test(name));
     if (!variant || prepared.has(image) || image.closest('[data-cx-motion="off"]')) return;
     prepared.add(image);
     const previous = image.getAttribute('style');
     const initialY = Number(gsap.getProperty(image, 'y')) || 0;
-    const distance = [-110, -160, -130, -95, 75, 100, 140, -100, 80][Number(variant.slice(4)) - 1];
+    const distance = [-110, -160, -130, -95, 75, 100, 140, -100, 80][parseInt(variant.slice(4), 10) - 1];
     const tween = gsap.fromTo(image, { y: initialY }, {
       y: () => initialY + distance * (innerWidth < 768 ? 0.45 : 1),
       ease: 'none',
