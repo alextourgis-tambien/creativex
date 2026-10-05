@@ -178,6 +178,26 @@
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
+    document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
+  }
+  function verticalHeroParallax(image) {
+    if (prepared.has(image) || image.closest('[data-cx-motion="off"]')) return;
+    prepared.add(image);
+    const previous = image.getAttribute('style');
+    const initialY = Number(gsap.getProperty(image, 'y')) || 0;
+    const direction = image.classList.contains('is--3') ? 1 : -1;
+    const tween = gsap.fromTo(image, { y: initialY }, {
+      y: () => initialY + direction * (innerWidth < 768 ? 60 : 120),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: image.closest('section,.section') || image.parentElement,
+        start: 'top top', end: 'bottom top', scrub: 1.1, invalidateOnRefresh: true
+      }
+    });
+    cleanups.push(() => {
+      tween.scrollTrigger.kill(); tween.kill();
+      if (previous === null) image.removeAttribute('style'); else image.setAttribute('style', previous);
+    });
   }
   function cardTabs(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
