@@ -312,11 +312,22 @@
     });
     let hovered = -1, focused = -1, current = -1, sequence;
     const duration = value => media.matches ? 0 : value;
-    gsap.set(images, { autoAlpha: 0, y: 24, scale: 0.97, pointerEvents: 'none' });
+    function setImages(category) {
+      images.forEach((image, index) => {
+        const source = sources[category][index] || baseImages[index];
+        ['src', 'srcset', 'sizes', 'alt'].forEach(name => {
+          const value = source.getAttribute(name);
+          if (value === null) image.removeAttribute(name); else image.setAttribute(name, value);
+        });
+      });
+    }
+    setImages(0);
+    gsap.set(images, { autoAlpha: 1, y: 0, scale: 1, pointerEvents: 'none' });
     gsap.set(arrows.filter(Boolean), { autoAlpha: 0, x: -8, scale: 0.8 });
     function update() {
       const next = hovered >= 0 ? hovered : focused;
       if (next === current) return;
+      const previousPreview = Math.max(0, current), preview = Math.max(0, next);
       current = next;
       labels.forEach((label, index) => {
         if (label) gsap.to(label, { opacity: next < 0 || next === index ? 1 : 0.35,
@@ -326,19 +337,11 @@
         if (arrow) gsap.to(arrow, { autoAlpha: next === index ? 1 : 0, x: next === index ? 0 : -8,
           scale: next === index ? 1 : 0.8, duration: duration(0.4), ease: 'power3.out', overwrite: true });
       });
+      if (preview === previousPreview) return;
       if (sequence) sequence.kill();
       sequence = gsap.timeline();
       sequence.to(images, { autoAlpha: 0, y: -10, duration: duration(0.16), ease: 'power2.in' });
-      if (next < 0) return;
-      sequence.call(() => {
-        images.forEach((image, index) => {
-          const source = sources[next][index] || baseImages[index];
-          ['src', 'srcset', 'sizes', 'alt'].forEach(name => {
-            const value = source.getAttribute(name);
-            if (value === null) image.removeAttribute(name); else image.setAttribute(name, value);
-          });
-        });
-      });
+      sequence.call(() => setImages(preview));
       sequence.fromTo(images, { autoAlpha: 0, y: 24, scale: 0.97 }, {
         autoAlpha: 1, y: 0, scale: 1, duration: duration(0.65), stagger: duration(0.08), ease: 'power3.out'
       });

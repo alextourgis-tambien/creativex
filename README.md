@@ -168,8 +168,9 @@ la photo `.image-3` de son item CMS dans `.category-image-1`. Le second visuel
 dans l’item CMS sera utilisé en priorité. Les autres `.category-text` passent à
 35 % d’opacité et seule la `.category-arrow` active apparaît. Les images entrent
 avec un fondu, 24 px de déplacement et un léger scale, décalées de 80 ms.
-À la sortie, les images et flèches disparaissent et les titres retrouvent leur
-opacité. Le focus clavier et le toucher déclenchent aussi l’aperçu ; le mouvement
+Les images de la première catégorie sont visibles dès le chargement. À la sortie,
+l’aperçu revient à cette catégorie ; les flèches disparaissent et les titres
+retrouvent leur opacité. Le focus clavier et le toucher déclenchent aussi l’aperçu ; le mouvement
 réduit conserve l’interaction sans animation. Les liens gardent leur navigation.
 
 ## Observabilité des médias — séquence sticky
