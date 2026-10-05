@@ -74,3 +74,32 @@ Le 5 octobre 2026, les snippets ont été installés dans les blocs head/footer 
 site et publiés sur le sous-domaine Webflow. Vérification sur la préproduction :
 asset figé chargé, Lenis actif, neuf boutons préparés, révélations au scroll
 actives et aucune erreur console.
+
+## Globe du hero
+
+`assets/world.js`, `assets/world.css` et `assets/world-land.json` dessinent un
+globe à fond transparent dans `.world__wrapper`. Aucun changement de structure
+Webflow nécessaire : conserver la largeur et la hauteur de cet emplacement.
+
+Projection sphérique sur Canvas, continents clairs, routes géographiques courbes,
+points circulants et panneaux blancs rattachés aux villes visibles. GSAP pilote
+une rotation complète en 95 secondes. Dix villes : Londres, Paris, New York,
+Mexico, São Paulo, Cape Town, Dubai, Singapour, Tokyo et Sydney. Les villes proches
+sont espacées dans la sélection pour éviter des panneaux superposés.
+
+Les campagnes et scores sont des exemples illustratifs. Ils ne proviennent pas
+d'une API CreativeX et se modifient dans le tableau `cities` de `world.js`.
+Les connexions se modifient dans `routes`, et la vitesse dans le tween `spin`.
+
+Le globe s'arrête au survol sur les appareils avec pointeur, hors écran et dans
+un onglet masqué. Avec mouvement réduit, il reste statique. Rendu limité à 30 fps
+et densité de pixels plafonnée à 2. `window.CreativeXWorld.destroy()` libère les
+animations, les observateurs et le DOM.
+
+Contours géographiques : Natural Earth, domaine public, résolution 110m.
+Source : https://github.com/nvkelso/natural-earth-vector/blob/master/geojson/ne_110m_admin_0_countries.geojson
+Le JSON local contient uniquement les contours arrondis à deux décimales, sans
+attributs des pays. Il est chargé depuis la même version CDN que `world.js`.
+
+Validation : syntaxe JS, rendu de la home Webflow sur desktop et à 390 px,
+absence de débordement horizontal, panneaux lisibles et fixture mouvement réduit.

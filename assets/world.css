@@ -1,0 +1,19 @@
+.cx-world { position: absolute; inset: 0; pointer-events: none; }
+.cx-world-canvas { position: absolute; inset: 0; display: block; width: 100%; height: 100%; }
+.cx-world-card {
+  position: absolute; top: 0; left: 0; display: flex; align-items: center; gap: 7px;
+  padding: 10px 11px; border-radius: 6px; background: rgba(255,255,255,.96);
+  color: #172e36; box-shadow: 0 3px 15px rgba(14,55,70,.05);
+  font: 500 var(--cx-world-font,8px)/1.3 Arial,sans-serif; letter-spacing: .065em;
+  white-space: nowrap; visibility: hidden; opacity: 0;
+}
+.cx-world-status {
+  display: grid; place-items: center; flex: 0 0 auto; width: 10px; height: 10px;
+  border-radius: 50%; background: #25c671; color: #fff;
+  font: 700 7px/1 Arial,sans-serif; letter-spacing: 0;
+}
+.cx-world-card.is-alert .cx-world-status { background: #ff526d; }
+.cx-world-card strong { font-weight: 700; }
+@media (max-width: 479px) {
+  .cx-world-card { padding: 8px; gap: 5px; letter-spacing: .03em; }
+}
