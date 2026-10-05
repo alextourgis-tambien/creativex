@@ -28,6 +28,10 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
   Arrêt progressif au survol ou au focus, reprise amortie, entrée décalée et bords estompés.
   Copies décoratives `aria-hidden` et `inert`, largeur recalculée après chargement des images
   et redimensionnement ; pause hors écran ou onglet masqué. Mouvement réduit : liste native.
+- Résultats `.bussines-cards` : apparition des contenus internes à `top 92%`,
+  opacité et déplacement de 20 px sur 0,85 s, décalage de 0,09 s entre logo,
+  texte et chiffres (ou photo, citation et signature). Léger décalage entre colonnes.
+  Une seule apparition, sans modifier le parallaxe des `.bussines-cards-vertical`.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.

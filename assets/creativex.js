@@ -152,6 +152,23 @@
     document.querySelectorAll('.obs-card').forEach(floatCard);
     document.querySelectorAll('.logo-wrapper').forEach(logoMarquee);
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
+    document.querySelectorAll('.bussines-cards').forEach(businessReveal);
+  }
+  function businessReveal(card) {
+    if (prepared.has(card) || card.closest('[data-cx-motion="off"]')) return;
+    prepared.add(card);
+    if (card.getBoundingClientRect().bottom < 0) return;
+    const content = card.querySelector('.bussines-cards-content');
+    const targets = content ? Array.from(content.children) : ['.bussines__img', '.bussines__text', '.bussiness__name-wrapper'].map(selector => card.querySelector(selector)).filter(Boolean);
+    if (!targets.length) return;
+    const column = card.closest('.bussines-cards-vertical');
+    const delay = column && column.matches('.is-2') ? 0.07 : column && column.matches('.is-3') ? 0.14 : 0;
+    // Animate inner content only: the columns retain their existing scroll parallax.
+    const tween = gsap.fromTo(targets, { opacity: 0, y: 20 }, {
+      opacity: 1, y: 0, duration: 0.85, stagger: 0.09, delay, ease: 'power3.out',
+      clearProps: 'transform,opacity', scrollTrigger: { trigger: card, start: 'top 92%', once: true }
+    });
+    tweens.push(tween);
   }
   function radialCards(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
