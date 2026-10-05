@@ -347,19 +347,19 @@
     if (!logo || groups.length !== 2) return;
     prepared.add(wrapper); wrapper.classList.add('cx-ver-carousel');
     const timeline = gsap.timeline({ scrollTrigger: {
-      trigger: wrapper, start: 'top 90%', end: 'center 35%', scrub: 1.2, invalidateOnRefresh: true
+      trigger: wrapper, start: 'top 95%', end: 'center 65%', scrub: .65, invalidateOnRefresh: true
     } });
-    groups.forEach((group, side) => {
+    groups.forEach(group => {
       Array.from(group.querySelectorAll('.ver-carousel__img')).forEach((image, index) => {
         const previous = image.getAttribute('style');
         const initialX = Number(gsap.getProperty(image, 'x')) || 0;
         const initialY = Number(gsap.getProperty(image, 'y')) || 0;
         const initialScale = Number(gsap.getProperty(image, 'scaleX')) || 1;
         function destinationX() {
-          const rect = image.getBoundingClientRect(), bounds = wrapper.getBoundingClientRect();
+          const rect = image.getBoundingClientRect(), target = logo.getBoundingClientRect();
           const center = rect.left + rect.width / 2 - (Number(gsap.getProperty(image, 'x')) || 0) + initialX;
-          const fraction = [0.02, 0.22, 0.35, 0.43][index % 4];
-          return initialX + bounds.left + bounds.width * (side ? 1 - fraction : fraction) - center;
+          const convergence = [0.25, 0.5, 0.72, 0.94][index % 4];
+          return initialX + (target.left + target.width / 2 - center) * convergence;
         }
         timeline.fromTo(image, { x: initialX, y: initialY, scale: initialScale }, {
           x: destinationX, y: initialY, scale: initialScale * .85,
