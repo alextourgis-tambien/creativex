@@ -40,6 +40,8 @@
     // Hidden FAQ answers must keep their native markup when the dropdown opens.
     if (element.matches('.paragraph') && element.closest('.faq__dropdown')) return;
     const styledTitle = element.matches(titleSelectors);
+    // Styled inline spans belong to their parent title; line wrappers would force a break.
+    if (styledTitle && element.tagName === 'SPAN') return;
     if (styledTitle && element.parentElement.closest(titleSelectors)) return;
     if (!styledTitle && element.parentElement.closest(revealSelectors + ',a,button')) return;
     if (prepared.has(element) || !element.getClientRects().length || (getComputedStyle(element).visibility === 'hidden' && !element.closest('.cx-media-obs')) || (!styledTitle && element.closest(exclude))) return;
