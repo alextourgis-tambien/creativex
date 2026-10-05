@@ -232,3 +232,8 @@ Mouvement réduit : le dernier état est visible sans animation liée au scroll.
 
 Les deux images sont hébergées par Webflow. Pour les remplacer, renseigner les
 attributs `data-cx-avatar` et `data-cx-campaign` sur `.algo__wrapper` avec les URLs.
+
+Les éléments de la séquence campagne flottent légèrement en vue, et les pointillés
+défilent en continu. Ces boucles se mettent en pause hors écran et dans un onglet
+masqué, et sont désactivées en mouvement réduit. Le portrait puis les deux bulles
+apparaissent séparément au début de la timeline de scroll.

@@ -247,17 +247,18 @@
     }
     fit(); const resize = new ResizeObserver(fit); resize.observe(code);
     const brief = scene.querySelector('.cx-algo-brief'), card = scene.querySelector('.cx-algo-campaign');
+    const conversation = [avatar, scene.querySelector('.cx-algo-message'), scene.querySelector('.cx-algo-plan')];
     const headlines = Array.from(scene.querySelectorAll('.cx-algo-headlines p'));
     const result = scene.querySelector('.cx-algo-result');
     draws.forEach(draw => { const length = draw.getTotalLength(); gsap.set(draw, { strokeDasharray: length, strokeDashoffset: length }); });
-    gsap.set([...tags.map(tag => tag.element), card, ...headlines, result], { autoAlpha: 0 });
+    gsap.set([...conversation, ...tags.map(tag => tag.element), card, ...headlines, result], { autoAlpha: 0 });
     gsap.set(scene.querySelectorAll('.cx-algo-cross'), { autoAlpha: 0, scale: 0.6 });
     const timeline = gsap.timeline({ paused: media.matches, defaults: { ease: 'power3.inOut' } });
-    timeline.fromTo(brief, { scale: 0.9, y: 12 }, { scale: 1.045, y: 0, duration: 0.35 }, 0)
-      .to(brief, { scale: 1, duration: 0.3 }, 0.35)
-      .to(draws, { strokeDashoffset: 0, duration: 1.15, stagger: { amount: 0.25, from: 'center' }, ease: 'power2.inOut' }, 0.5)
-      .fromTo(tags.map(tag => tag.element), { y: 14, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, stagger: 0.06 }, 1.0)
-      .fromTo(headlines[0], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.55 }, 1.2)
+    timeline.fromTo(scene, { '--cx-algo-drift': '5px' }, { '--cx-algo-drift': '-5px', duration: 6.55, ease: 'none' }, 0)
+      .fromTo(conversation, { scale: 0.92, y: 12 }, { autoAlpha: 1, scale: 1, y: 0, duration: 0.48, stagger: 0.28, ease: 'power3.out' }, 0)
+      .to(draws, { strokeDashoffset: 0, duration: 1.15, stagger: { amount: 0.25, from: 'center' }, ease: 'power2.inOut' }, 0.85)
+      .fromTo(tags.map(tag => tag.element), { y: 14, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, stagger: 0.06 }, 1.2)
+      .fromTo(headlines[0], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.55 }, 1.4)
       .fromTo(card, { y: 28, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6 }, 1.9)
       .to(headlines[0], { autoAlpha: 0, y: -12, duration: 0.3 }, 3.0)
       .fromTo(headlines[1], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 3.18);
@@ -278,7 +279,13 @@
       tags.forEach(tag => { tag.status.textContent = tag.fails && timeline.time() >= 3.37 + tags.filter(t => t.fails).indexOf(tag) * 0.1 ? ': drift detected' : ': validated'; });
     }
     timeline.eventCallback('onUpdate', updateStatus); updateStatus();
-    cleanups.push(() => { resize.disconnect(); if (trigger) trigger.kill(); timeline.kill(); scene.remove(); code.classList.remove('cx-algo-code'); });
+    // Ambient motion uses individual CSS translate, leaving scroll transforms intact.
+    let inView = false;
+    const updateMotion = () => scene.classList.toggle('cx-algo-running', inView && !document.hidden && !media.matches);
+    const visibility = new IntersectionObserver(entries => { inView = entries[0].isIntersecting; updateMotion(); });
+    visibility.observe(code);
+    document.addEventListener('visibilitychange', updateMotion);
+    cleanups.push(() => { visibility.disconnect(); document.removeEventListener('visibilitychange', updateMotion); resize.disconnect(); if (trigger) trigger.kill(); timeline.kill(); scene.remove(); code.classList.remove('cx-algo-code'); });
   }
   function systemOrbit(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
