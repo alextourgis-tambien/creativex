@@ -156,6 +156,10 @@ html.lenis, html.lenis body { height: auto; }
 .cx-card-tabs .slider-button { cursor: pointer; }
 .cx-card-tabs .slider-button:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .cx-card-tabs .slider-button .line { transform-origin: left center; }
+.cx-ver-carousel { position: relative; isolation: isolate; overflow: clip; }
+.cx-ver-carousel .ver-carousel__img-wrapper { z-index: 0; }
+.cx-ver-carousel .ver-carousel__logo-wrapper { position: relative; z-index: 2; }
+.cx-ver-carousel .ver-carousel__img { will-change: transform; }
 /* Follow Webflow's native open state, including keyboard and outside clicks. */
 .faq__dropdown .question-button { rotate: 0deg; transition: rotate .4s cubic-bezier(.22, 1, .36, 1); }
 .faq__dropdown .w-dropdown-toggle[aria-expanded="true"] .question-button { rotate: 90deg; }

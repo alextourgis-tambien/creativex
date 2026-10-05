@@ -178,7 +178,40 @@
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
+    document.querySelectorAll('.ver-carousel__wrapper').forEach(verticalCarousel);
     document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
+  }
+  function verticalCarousel(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const logo = wrapper.querySelector('.ver-carousel__logo-wrapper');
+    const groups = Array.from(wrapper.querySelectorAll('.ver-carousel__img-wrapper'));
+    if (!logo || groups.length !== 2) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-ver-carousel');
+    const timeline = gsap.timeline({ scrollTrigger: {
+      trigger: wrapper, start: 'top 90%', end: 'center 35%', scrub: 1.2, invalidateOnRefresh: true
+    } });
+    groups.forEach((group, side) => {
+      Array.from(group.querySelectorAll('.ver-carousel__img')).forEach((image, index) => {
+        const previous = image.getAttribute('style');
+        const initialX = Number(gsap.getProperty(image, 'x')) || 0;
+        const initialY = Number(gsap.getProperty(image, 'y')) || 0;
+        const initialScale = Number(gsap.getProperty(image, 'scaleX')) || 1;
+        function destinationX() {
+          const rect = image.getBoundingClientRect(), bounds = wrapper.getBoundingClientRect();
+          const center = rect.left + rect.width / 2 - (Number(gsap.getProperty(image, 'x')) || 0) + initialX;
+          const fraction = [0.02, 0.22, 0.35, 0.43][index % 4];
+          return initialX + bounds.left + bounds.width * (side ? 1 - fraction : fraction) - center;
+        }
+        timeline.fromTo(image, { x: initialX, y: initialY, scale: initialScale }, {
+          x: destinationX, y: initialY, scale: initialScale * .85,
+          duration: 1, ease: 'none'
+        }, 0);
+        cleanups.push(() => {
+          if (previous === null) image.removeAttribute('style'); else image.setAttribute('style', previous);
+        });
+      });
+    });
+    cleanups.push(() => { timeline.scrollTrigger.kill(); timeline.kill(); wrapper.classList.remove('cx-ver-carousel'); });
   }
   function verticalHeroParallax(image) {
     if (prepared.has(image) || image.closest('[data-cx-motion="off"]')) return;
