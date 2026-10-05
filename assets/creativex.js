@@ -4,7 +4,7 @@
   if (window.CreativeX) return;
   const media = matchMedia('(prefers-reduced-motion: reduce)');
   const titleSelectors = '.title--1,.title--3,.title--2,.title-main,.highligts__title,.text-55-serif-medium,.case__title-main,.nl__title,.contact__title,.report-highligts__title';
-  const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,.text-big,.text-greed-medium-small,.p-big,.text-greed-regular,[data-cx-reveal]';
+  const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,.text-big,.text-greed-medium-small,.p-big,.text-greed-regular,.text-quote,[data-cx-reveal]';
   const exclude = '.section-observability,.section-bussiness,.section-tabs,.images-loop-wrapper,.blog-slider,[data-cx-motion="off"]';
   const cleanups = [], splits = [], tweens = [];
   const prepared = new Set(), revealed = new WeakSet();
