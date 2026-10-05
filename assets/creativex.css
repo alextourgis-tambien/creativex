@@ -90,12 +90,13 @@ html.lenis, html.lenis body { height: auto; }
 .cx-algo-brief { animation-duration: 6.8s; --cx-algo-depth: 0.4; }
 .cx-algo-campaign { --cx-algo-depth: 1.2; }
 .cx-algo-tag:nth-child(even) { --cx-algo-depth: -0.6; }
-.cx-algo-result { animation-delay: -2.4s; }
+.cx-algo-result { animation-name: cx-algo-result-float; animation-delay: -2.4s; --cx-algo-depth: -1.2; }
 .cx-algo-running .cx-algo-paths > path,
 .cx-algo-running .cx-algo-brief, .cx-algo-running .cx-algo-tag,
 .cx-algo-running .cx-algo-campaign, .cx-algo-running .cx-algo-result { animation-play-state: running; }
 @keyframes cx-algo-flow { to { stroke-dashoffset: -28; } }
 @keyframes cx-algo-float { from { translate: 0 calc(var(--cx-algo-drift, 0px) * var(--cx-algo-depth, 1) - 2px); } to { translate: 0 calc(var(--cx-algo-drift, 0px) * var(--cx-algo-depth, 1) + 3px); } }
+@keyframes cx-algo-result-float { from { translate: var(--cx-algo-result-x, 0px) calc(var(--cx-algo-result-y, 0px) - 2px); } to { translate: var(--cx-algo-result-x, 0px) calc(var(--cx-algo-result-y, 0px) + 3px); } }
 @media (prefers-reduced-motion: reduce) {
   .cx-algo-paths > path, .cx-algo-brief, .cx-algo-tag, .cx-algo-campaign, .cx-algo-result { animation: none; }
 }

@@ -269,6 +269,7 @@
     });
     timeline.to(headlines[1], { autoAlpha: 0, y: -12, duration: 0.3 }, 4.65)
       .fromTo(headlines[2], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 4.83)
+      .fromTo(scene, { '--cx-algo-result-x': '-6px', '--cx-algo-result-y': '10px' }, { '--cx-algo-result-x': '6px', '--cx-algo-result-y': '-10px', duration: 1.3, ease: 'none' }, 5.25)
       .fromTo(result, { y: 24, scale: 0.88 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65 }, 5.25)
       .to({}, { duration: 0.65 }, 5.9);
     let trigger;
