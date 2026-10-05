@@ -54,9 +54,9 @@
       }
     }));
   }
-  function button(element) {
+  function button(element, textElement) {
     if (prepared.has(element) || element.closest('[data-cx-motion="off"]')) return;
-    const label = element.querySelector('.button-text');
+    const label = textElement || element.querySelector('.button-text');
     if (!label || !label.textContent.trim() || label.querySelector('a,button,input')) return;
     prepared.add(element);
     const leading = getComputedStyle(label).lineHeight;
@@ -87,7 +87,16 @@
   }
   function prepare() {
     document.querySelectorAll('h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]').forEach(reveal);
-    document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(button);
+    document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));
+    document.querySelectorAll('.nav__dropdown-wrapper').forEach(element => {
+      button(element, element.querySelector('.navbar-link-text'));
+    });
+    document.querySelectorAll('.navbar-link-text').forEach(label => {
+      button(label.closest('a,button,.nav__dropdown-wrapper') || label, label);
+    });
+    document.querySelectorAll('.footer-link').forEach(element => {
+      button(element, element.querySelector('.footer-link-text') || element);
+    });
   }
   function clearEntry() {
     document.documentElement.classList.remove('cx-entering'); clearTimeout(window.cxEntryFallback);

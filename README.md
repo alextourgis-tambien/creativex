@@ -14,6 +14,8 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
 - Hero : titres par lignes masquées (1,05 s), paragraphe progressif et CTA légèrement soulevé.
 - Scroll : titres et paragraphes révélés une fois, avec décalage entre les lignes.
 - Boutons `.button` / `.button-text` : texte qui défile verticalement au survol et au focus clavier.
+- Même effet sur `.nav__dropdown-wrapper`, `.navbar-link-text` et `.footer-link`
+  (libellé `.footer-link-text`), sans déplacer les icônes ni changer les contrôles Webflow.
 - Lenis : lissage des mouvements de molette, `lerp: 0.14`, toucher natif sur mobile.
 - Pages : rideau bleu pétrole à la sortie (0,55 s), puis ouverture à l'arrivée (0,7 s).
   La navigation charge réellement la nouvelle page, avec le cycle Webflow habituel.
