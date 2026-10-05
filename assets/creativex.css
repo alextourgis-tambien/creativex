@@ -166,6 +166,8 @@ html.lenis, html.lenis body { height: auto; }
 .cx-belief-slider .button-slider-belief[aria-disabled="true"] { opacity: .35; cursor: default; }
 .cx-belief-slider .button-slider-belief:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 @media (min-width: 768px) and (hover: hover) and (pointer: fine) {
+  .team-list > .team-item { transition: opacity .35s ease; }
+  .team-list:has(> .team-item:hover) > .team-item:not(:hover) { opacity: .4; }
   .team-item .team-image.is--desktop {
     display: block;
     pointer-events: none;
@@ -187,6 +189,7 @@ html.lenis, html.lenis body { height: auto; }
   }
 }
 @media (prefers-reduced-motion: reduce) {
+  .team-list > .team-item { transition: none; }
   .team-item .team-image.is--desktop { transform: none !important; transition: none !important; }
 }
 .cx-collection-filter .filter__text-wrapper:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
