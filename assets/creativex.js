@@ -158,6 +158,7 @@
   function prepare() {
     document.querySelectorAll('.filter').forEach(collectionFilter);
     document.querySelectorAll('.blog-slider').forEach(blogSlider);
+    document.querySelectorAll('.belief-slider').forEach(beliefSlider);
     document.querySelectorAll('.slider-tab-wrapper').forEach(cardTabs);
     document.querySelectorAll('.testimonials-cms').forEach(testimonialSlider);
     document.querySelectorAll('.section-tabs').forEach(mediaObservability);
@@ -291,6 +292,43 @@
     items.forEach(item => resize.observe(item)); select(0, true);
     cleanups.push(() => {
       resize.disconnect(); if (motion) motion.kill(); wrapper.classList.remove('cx-blog-slider');
+      saved.forEach(({element,attributes}) => attributes.forEach(([name,value]) => value === null ? element.removeAttribute(name) : element.setAttribute(name,value)));
+    });
+  }
+  function beliefSlider(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const track = wrapper.querySelector('.slider-list'), viewport = wrapper.querySelector('.slider-cms');
+    const buttons = Array.from(wrapper.querySelectorAll('.button-slider-belief.is-previous,.button-slider-belief.is-next'));
+    const items = track ? Array.from(track.children).filter(item => item.classList.contains('w-dyn-item')) : [];
+    if (!viewport || !items.length || !buttons.length) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-belief-slider');
+    const saved = [track, ...buttons].map(element => ({ element, attributes: ['style','role','tabindex','aria-label','aria-disabled'].map(name => [name, element.getAttribute(name)]) }));
+    const initialX = Number(gsap.getProperty(track, 'x')) || 0;
+    let active = 0, motion;
+    buttons.forEach(button => {
+      button.setAttribute('role', 'button'); button.setAttribute('tabindex', '0');
+      button.setAttribute('aria-label', button.classList.contains('is-next') ? 'Croyance suivante' : 'Croyance précédente');
+    });
+    function select(index, instant = false) {
+      active = Math.max(0, Math.min(items.length - 1, index));
+      if (motion) motion.kill();
+      const first = items[0].getBoundingClientRect(), last = items[items.length - 1].getBoundingClientRect();
+      const maximum = Math.max(0, last.right - first.left - viewport.clientWidth);
+      const offset = Math.min(maximum, items[active].getBoundingClientRect().left - first.left);
+      buttons.forEach(button => button.setAttribute('aria-disabled', String(button.classList.contains('is-next') ? offset >= maximum - 1 : offset <= 1)));
+      motion = gsap.to(track, { x: initialX - offset, duration: instant || media.matches ? 0 : .75, ease: 'power3.inOut', overwrite: true });
+    }
+    function navigate(event) {
+      const button = event.target.closest('.button-slider-belief');
+      if (!buttons.includes(button) || (event.type === 'keydown' && !['Enter',' '].includes(event.key))) return;
+      event.preventDefault();
+      if (button.getAttribute('aria-disabled') !== 'true') select(active + (button.classList.contains('is-next') ? 1 : -1));
+    }
+    listen(wrapper, 'click', navigate); listen(wrapper, 'keydown', navigate);
+    const resize = new ResizeObserver(() => select(active, true)); resize.observe(viewport);
+    items.forEach(item => resize.observe(item)); select(0, true);
+    cleanups.push(() => {
+      resize.disconnect(); if (motion) motion.kill(); wrapper.classList.remove('cx-belief-slider');
       saved.forEach(({element,attributes}) => attributes.forEach(([name,value]) => value === null ? element.removeAttribute(name) : element.setAttribute(name,value)));
     });
   }

@@ -161,6 +161,10 @@ html.lenis, html.lenis body { height: auto; }
 .cx-collection-filter .filter__text-wrapper[aria-pressed="true"] { background: #003e50; color: #fff; }
 .cx-collection-filter .filter__text-wrapper[aria-pressed="true"] .filter__text { color: inherit; }
 .cx-filter-all { font: inherit; color: inherit; text-align: left; border: 0; background: transparent; width: 100%; padding: 12px 16px; }
+.cx-belief-slider .slider-cms { overflow: clip; }
+.cx-belief-slider .slider-list { will-change: transform; }
+.cx-belief-slider .button-slider-belief[aria-disabled="true"] { opacity: .35; cursor: default; }
+.cx-belief-slider .button-slider-belief:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 .cx-collection-filter .filter__text-wrapper:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 .cx-filter-empty { padding: 24px 0; }
 .article-item { transition: translate .5s cubic-bezier(.22,1,.36,1), box-shadow .5s ease; }
