@@ -1,5 +1,6 @@
 /* Content stays readable before the animation runtime loads. */
 .cx-line-mask, .cx-mask-line-mask { overflow: clip; padding-block: 0.12em; margin-block: -0.12em; }
+.cx-title-lines { display: flex; flex-direction: column; }
 /* Two identical text rows share one stable box; only their letters move. */
 .cx-hover-label { position: relative; }
 .cx-hover-mask { display: inline-grid; vertical-align: middle; overflow: hidden; padding-block: 0.16em; margin-block: -0.16em; }

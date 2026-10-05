@@ -188,10 +188,11 @@ Au milieu, les titres et paragraphes `.is--media-obs-1` se remplacent par les
 Cette section est exclue des révélations génériques, tout en conservant la
 Greed sur la dernière ligne des titres. Mouvement réduit : état final statique.
 
-La ligne automatiquement passée en `.span__greed` conserve explicitement la
-hauteur de ligne du titre. Si Webflow utilise `line-height: normal`, la hauteur
-de la première ligne serif sert de référence. Cette mesure est recalculée par
-SplitText aux changements de largeur et au chargement des polices.
+La dernière ligne reçoit un vrai `span.span__greed` inline : son bloc de ligne
+conserve la fonte serif et sa baseline, comme dans le builder Webflow. Les titres
+multilignes animés utilisent une colonne flex pour empêcher la fusion des marges
+négatives des masques et retrouver exactement l’espacement natif entre les lignes.
+SplitText recalcule la dernière ligne aux changements de largeur et de police.
 
 ## Système orbital CreativeX
 

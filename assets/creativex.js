@@ -44,16 +44,18 @@
     prepared.add(element);
     if (element.getBoundingClientRect().bottom < 0) revealed.add(element);
     const animate = !media.matches && element.matches(revealSelectors) && !element.closest(exclude);
+    cleanups.push(() => element.classList.remove('cx-title-lines'));
     const hero = !!element.closest('.section-hero'), title = /^H\d$/.test(element.tagName);
     splits.push(SplitText.create(element, {
       type: 'lines', mask: animate ? 'lines' : undefined, linesClass: 'cx-line', autoSplit: true,
       onSplit(self) {
+        element.classList.toggle('cx-title-lines', styledTitle && animate && self.lines.length > 1);
         if (styledTitle && self.lines.length > 1) {
           const lastLine = self.lines[self.lines.length - 1];
-          const lineHeight = getComputedStyle(element).lineHeight;
-          // Preserve the serif line box, including titles using normal font metrics.
-          lastLine.style.lineHeight = lineHeight === 'normal' ? self.lines[0].getBoundingClientRect().height + 'px' : lineHeight;
-          lastLine.classList.add('span__greed');
+          // Keep the serif line's baseline strut, as with an inline span in Webflow.
+          const span = document.createElement('span'); span.className = 'span__greed';
+          while (lastLine.firstChild) span.appendChild(lastLine.firstChild);
+          lastLine.append(span);
         }
         if (!animate) return;
         if (revealed.has(element)) return gsap.set(self.lines, { yPercent: 0, opacity: 1 });
