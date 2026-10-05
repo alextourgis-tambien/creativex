@@ -203,7 +203,8 @@
     function select(index, instant = false) {
       active = (index + items.length) % items.length;
       if (motion) motion.kill();
-      const destination = initialX - (items[active].getBoundingClientRect().left - items[0].getBoundingClientRect().left);
+      const card = items[active].getBoundingClientRect(), viewport = track.parentElement.getBoundingClientRect();
+      const destination = (Number(gsap.getProperty(track, 'x')) || 0) + viewport.left + viewport.width / 2 - card.left - card.width / 2;
       items.forEach((item, i) => { item.setAttribute('aria-hidden', String(i !== active)); item.toggleAttribute('inert', i !== active); });
       motion = gsap.to(track, { x: destination, duration: instant || media.matches ? 0 : .9, ease: 'power3.inOut', overwrite: true });
     }
