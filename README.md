@@ -239,6 +239,6 @@ masqué, et sont désactivées en mouvement réduit. Le portrait puis les deux b
 apparaissent séparément au début de la timeline de scroll.
 
 Le hero Solutions anime verticalement `.solutions-h__img-wrapper` et
-`.solution-h__element-wrapper`, avec des déplacements limités à 18–32px et
+`.solution-h__element-wrapper`, avec des déplacements de 70–120px et
 réduits sur mobile. Le débattement est borné à chaque refresh pour garder
 les images hors de la zone `.solution-hero-content`.

@@ -190,7 +190,7 @@
         const currentY = Number(gsap.getProperty(image, 'y')) || 0;
         const top = rect.top - currentY + initialY, bottom = rect.bottom - currentY + initialY;
         const factor = innerWidth < 768 ? 0.4 : 1;
-        let distance = [18, 32, -24, 22, -20, 26][index % 6] * factor;
+        let distance = [70, 120, 96, 85, -90, 100][index % 6] * factor;
         // Clamp the full travel against the native text area, including on resize.
         if (rect.right > text.left && rect.left < text.right) {
           if (top >= text.bottom) distance = Math.max(distance, text.bottom + 14 - top);
