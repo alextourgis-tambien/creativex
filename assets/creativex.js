@@ -3,6 +3,8 @@
   'use strict';
   if (window.CreativeX) return;
   const media = matchMedia('(prefers-reduced-motion: reduce)');
+  const titleSelectors = '.title--1,.title--3,.title--2,.title-main,.highligts__title,.text-55-serif-medium,.case__title-main,.nl__title,.contact__title,.report-highligts__title';
+  const revealSelectors = 'h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]';
   const exclude = '.section-observability,.section-bussiness,.images-loop-wrapper,[data-cx-motion="off"]';
   const cleanups = [], splits = [], tweens = [];
   const prepared = new Set(), revealed = new WeakSet();
@@ -35,14 +37,19 @@
     });
   }
   function reveal(element) {
-    if (prepared.has(element) || !element.getClientRects().length || getComputedStyle(element).visibility === 'hidden' || element.closest(exclude)) return;
+    const styledTitle = element.matches(titleSelectors);
+    if (styledTitle && element.parentElement.closest(titleSelectors)) return;
+    if (prepared.has(element) || !element.getClientRects().length || getComputedStyle(element).visibility === 'hidden' || (!styledTitle && element.closest(exclude))) return;
     if (element.querySelector('a,button,input,select,textarea,iframe,svg,img')) return;
     prepared.add(element);
-    if (element.getBoundingClientRect().bottom < 0) { revealed.add(element); return; }
+    if (element.getBoundingClientRect().bottom < 0) revealed.add(element);
+    const animate = !media.matches && element.matches(revealSelectors) && !element.closest(exclude);
     const hero = !!element.closest('.section-hero'), title = /^H\d$/.test(element.tagName);
     splits.push(SplitText.create(element, {
-      type: 'lines', mask: 'lines', linesClass: 'cx-line', autoSplit: true,
+      type: 'lines', mask: animate ? 'lines' : undefined, linesClass: 'cx-line', autoSplit: true,
       onSplit(self) {
+        if (styledTitle && self.lines.length > 1) self.lines[self.lines.length - 1].classList.add('span__greed');
+        if (!animate) return;
         if (revealed.has(element)) return gsap.set(self.lines, { yPercent: 0, opacity: 1 });
         const tween = gsap.fromTo(self.lines, { yPercent: title ? 110 : 65, opacity: title ? 1 : 0 }, {
           yPercent: 0, opacity: 1, duration: title ? 1.05 : 0.8, ease: 'power3.out',
@@ -138,7 +145,8 @@
   }
 
   function prepare() {
-    document.querySelectorAll('h1.title--1,h2.title--2,h2.title--3,h3.title--2,h3.title--3,p.paragraph,[data-cx-reveal]').forEach(reveal);
+    document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
+    if (media.matches) return;
     document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));
     document.querySelectorAll('.nav__dropdown-wrapper').forEach(element => {
       button(element, element.querySelector('.navbar-link-text'));
@@ -404,25 +412,25 @@
   }
   async function start() {
     const current = ++generation;
-    if (media.matches) { clearEntry(); return; }
+    if (media.matches) clearEntry();
     try {
       gsap = await dependency('gsap', 'https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/gsap.min.js');
       const libraries = await Promise.all([
         dependency('ScrollTrigger', 'https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/ScrollTrigger.min.js'),
         dependency('SplitText', 'https://cdn.jsdelivr.net/npm/gsap@3.13.0/dist/SplitText.min.js'),
-        dependency('Lenis', 'https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js').catch(() => null)
+        media.matches ? Promise.resolve(null) : dependency('Lenis', 'https://cdn.jsdelivr.net/npm/lenis@1.3.11/dist/lenis.min.js').catch(() => null)
       ]);
-      if (current !== generation || media.matches) return;
+      if (current !== generation) return;
       ST = libraries[0]; SplitText = libraries[1]; gsap.registerPlugin(ST, SplitText);
       if (document.fonts) await Promise.race([document.fonts.ready, new Promise(resolve => setTimeout(resolve, 1500))]);
-      if (current !== generation || media.matches) return;
+      if (current !== generation) return;
       active = true;
       ctx = gsap.context(() => {
         prepare();
         const heroButtons = document.querySelectorAll('.section-hero .button');
-        if (heroButtons.length) gsap.from(heroButtons, { y: 18, opacity: 0, duration: 0.8, delay: 0.6, ease: 'power3.out', clearProps: 'transform,opacity' });
+        if (!media.matches && heroButtons.length) gsap.from(heroButtons, { y: 18, opacity: 0, duration: 0.8, delay: 0.6, ease: 'power3.out', clearProps: 'transform,opacity' });
       });
-      if (window.lenis && typeof window.lenis.scrollTo === 'function') lenis = window.lenis;
+      if (!media.matches && window.lenis && typeof window.lenis.scrollTo === 'function') lenis = window.lenis;
       else if (libraries[2]) {
         ownLenis = true;
         lenis = new libraries[2]({ lerp: 0.14, smoothWheel: true, syncTouch: false, autoRaf: false,
@@ -431,11 +439,13 @@
         const tick = time => lenis && lenis.raf(time * 1000);
         gsap.ticker.add(tick); cleanups.push(() => gsap.ticker.remove(tick));
       }
-      navigation(); listen(window, 'load', () => ST.refresh());
+      if (!media.matches) navigation();
+      listen(window, 'load', () => ST.refresh());
       listen(document, 'click', () => { clearTimeout(refreshTimer); refreshTimer = setTimeout(api.refresh, 180); });
+      listen(window, 'resize', () => { clearTimeout(refreshTimer); refreshTimer = setTimeout(api.refresh, 180); });
       ST.refresh();
     } catch (error) { destroy(); console.warn('[CreativeX] Motion unavailable; native content remains readable.', error); }
   }
-  media.addEventListener('change', () => { destroy(); if (!media.matches) start(); });
+  media.addEventListener('change', () => { destroy(); start(); });
   window.Webflow = window.Webflow || []; window.Webflow.push(start);
 })();

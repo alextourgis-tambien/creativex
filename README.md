@@ -145,3 +145,13 @@ champ. L’arc, la hauteur et l’espacement se recalculent sur mobile et au res
 Les copies sont décoratives (`aria-hidden`, `inert`). Mouvement réduit : rangée native.
 L’ancien script inline home ciblant `.loop-card` et sa CSS ont été remplacés par
 ce module ; les cartes réelles portent la classe `.card`.
+
+## Dernière ligne des titres
+
+Les titres `.title--1`, `.title--3`, `.title--2`, `.title-main`, `.highligts__title`,
+`.text-55-serif-medium`, `.case__title-main`, `.nl__title`, `.contact__title` et
+`.report-highligts__title` reçoivent `.span__greed` sur leur dernière ligne visuelle,
+uniquement quand SplitText détecte plusieurs lignes. Recalcul automatique au resize
+et au chargement des polices. Les spans déjà stylés dans Webflow sont conservés ;
+les titres imbriqués ne sont pas découpés une seconde fois. Ce traitement typographique
+reste actif avec mouvement réduit, sans animation, Lenis ni transition.
