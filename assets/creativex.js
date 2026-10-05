@@ -157,6 +157,7 @@
     document.querySelectorAll(titleSelectors + ',' + revealSelectors).forEach(reveal);
     document.querySelectorAll('.category-wrapper').forEach(categoryPreview);
     document.querySelectorAll('.system__wrapper').forEach(systemOrbit);
+    document.querySelectorAll('.algo__wrapper').forEach(campaignDrift);
     if (media.matches) return;
     document.querySelectorAll('a.button,button.button,[data-cx-button]').forEach(element => button(element));
     document.querySelectorAll('.nav__dropdown-wrapper').forEach(element => {
@@ -173,6 +174,111 @@
     document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
     document.querySelectorAll('.bussines-cards').forEach(businessReveal);
     document.querySelectorAll('.cta-wrapper-right').forEach(ctaCards);
+  }
+  function campaignDrift(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const code = wrapper.querySelector('.algo__code');
+    if (!code) return;
+    prepared.add(wrapper); code.classList.add('cx-algo-code');
+    const scene = document.createElement('div'); scene.className = 'cx-algo-scene';
+    // Assets may be overridden on the Webflow wrapper without changing the runtime.
+    const defaults = {
+      avatar: 'https://cdn.prod.website-files.com/6aa7d07d0a5547ba570016cd/6ac3762f1faeb02a0ce4d0e8_Rectangle%20427322441.avif',
+      campaign: 'https://cdn.prod.website-files.com/6aa7d07d0a5547ba570016cd/6ac3762d06045b7bd5a1f006_Frame%2014671.avif'
+    };
+    const asset = name => wrapper.getAttribute('data-cx-' + name) || defaults[name];
+    scene.innerHTML = `
+      <div class="cx-algo-brief">
+        <img class="cx-algo-avatar" alt="Campaign team member" width="50" height="50">
+        <div class="cx-algo-message">Hey team, we need to work on this campaign</div>
+        <div class="cx-algo-plan"><strong>SpritzNYC Summer Campaign</strong><br>Australia 2026</div>
+      </div>
+      <div class="cx-algo-headlines">
+        <p>Drift between what was planned and what shipped</p>
+        <p>Drift between what shipped and what worked</p>
+        <p>The drift is often invisible until the campaign is over.</p>
+      </div>
+      <article class="cx-algo-campaign">
+        <img alt="SpritzNYC drinks campaign by the pool" width="380" height="282">
+        <span class="cx-algo-assets">156 ASSETS</span>
+        <div><strong>SpritzNYC Summer Campaign</strong><br>Australia 2026</div>
+      </article>
+      <div class="cx-algo-result"><span class="cx-algo-percent">40%</span><span class="cx-algo-spend">↓ OBSERVABLE MEDIA SPEND</span></div>`;
+    const avatar = scene.querySelector('.cx-algo-avatar'), campaignImage = scene.querySelector('.cx-algo-campaign img');
+    if (asset('avatar')) avatar.src = asset('avatar');
+    if (asset('campaign')) campaignImage.src = asset('campaign');
+    const namespace = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(namespace, 'svg');
+    svg.setAttribute('viewBox', '0 0 1148 876'); svg.setAttribute('preserveAspectRatio', 'none');
+    svg.setAttribute('aria-hidden', 'true'); svg.classList.add('cx-algo-paths');
+    const defs = document.createElementNS(namespace, 'defs'); svg.append(defs);
+    const id = 'cx-drift-' + document.querySelectorAll('.cx-algo-scene').length;
+    const draws = [-650, -505, -370, -230, -80, 95, 235, 370, 505, 650].map((spread, index) => {
+      const d = `M580 212 C${580 + spread} 224 ${590 + spread} 598 590 616`;
+      const mask = document.createElementNS(namespace, 'mask'); mask.id = id + '-' + index;
+      mask.setAttribute('maskUnits', 'userSpaceOnUse');
+      mask.setAttribute('x', '0'); mask.setAttribute('y', '0'); mask.setAttribute('width', '1148'); mask.setAttribute('height', '876');
+      const draw = document.createElementNS(namespace, 'path'); draw.setAttribute('d', d);
+      draw.setAttribute('fill', 'none'); draw.setAttribute('stroke', 'white'); draw.setAttribute('stroke-width', '4');
+      mask.append(draw); defs.append(mask);
+      const path = document.createElementNS(namespace, 'path'); path.setAttribute('d', d);
+      path.setAttribute('mask', `url(#${mask.id})`); svg.append(path); return draw;
+    });
+    scene.prepend(svg); code.append(scene);
+    const check = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><path d="m6 10 3 3 5-6"/></svg>';
+    const cross = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9"/><path d="m7 7 6 6m0-6-6 6"/></svg>';
+    const definitions = [
+      ['MESSAGING', 30.8, 30.2, false], ['CHANNELS', 42.2, 36.2, true],
+      ['TARGET AUDIENCE', 68.6, 34.9, true], ['MARKETS', 53.7, 49.5, true],
+      ['PLATFORMS', 77.5, 51.5, false], ['BUDGET', 25.8, 56.5, true],
+      ['DESIGN', 41.1, 59.2, true], ['GOALS', 67.5, 60.3, false]
+    ];
+    const tags = definitions.map(([label, x, y, fails]) => {
+      const element = document.createElement('div'); element.className = 'cx-algo-tag';
+      element.style.left = x + '%'; element.style.top = y + '%';
+      element.innerHTML = `<span class="cx-algo-status"><span class="cx-algo-check">${check}</span><span class="cx-algo-cross">${cross}</span></span><span>${label}</span>`;
+      const status = document.createElement('span'); status.className = 'cx-algo-sr'; status.textContent = ': validated'; element.append(status);
+      scene.append(element); return { element, fails, status };
+    });
+    function fit() {
+      const width = innerWidth < 768 ? 600 : 1148, height = innerWidth < 768 ? 930 : 876;
+      scene.style.width = width + 'px'; scene.style.height = height + 'px';
+      scene.style.setProperty('--cx-algo-scale', Math.min(code.clientWidth / width, Math.max(1, code.clientHeight - 96) / height));
+    }
+    fit(); const resize = new ResizeObserver(fit); resize.observe(code);
+    const brief = scene.querySelector('.cx-algo-brief'), card = scene.querySelector('.cx-algo-campaign');
+    const headlines = Array.from(scene.querySelectorAll('.cx-algo-headlines p'));
+    const result = scene.querySelector('.cx-algo-result');
+    draws.forEach(draw => { const length = draw.getTotalLength(); gsap.set(draw, { strokeDasharray: length, strokeDashoffset: length }); });
+    gsap.set([...tags.map(tag => tag.element), card, ...headlines, result], { autoAlpha: 0 });
+    gsap.set(scene.querySelectorAll('.cx-algo-cross'), { autoAlpha: 0, scale: 0.6 });
+    const timeline = gsap.timeline({ paused: media.matches, defaults: { ease: 'power3.inOut' } });
+    timeline.fromTo(brief, { scale: 0.9, y: 12 }, { scale: 1.045, y: 0, duration: 0.35 }, 0)
+      .to(brief, { scale: 1, duration: 0.3 }, 0.35)
+      .to(draws, { strokeDashoffset: 0, duration: 1.15, stagger: { amount: 0.25, from: 'center' }, ease: 'power2.inOut' }, 0.5)
+      .fromTo(tags.map(tag => tag.element), { y: 14, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.38, stagger: 0.06 }, 1.0)
+      .fromTo(headlines[0], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.55 }, 1.2)
+      .fromTo(card, { y: 28, scale: 0.9 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.6 }, 1.9)
+      .to(headlines[0], { autoAlpha: 0, y: -12, duration: 0.3 }, 3.0)
+      .fromTo(headlines[1], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 3.18);
+    tags.filter(tag => tag.fails).forEach((tag, index) => {
+      const at = 3.25 + index * 0.1;
+      timeline.to(tag.element.querySelector('.cx-algo-check'), { autoAlpha: 0, scale: 0.6, duration: 0.25 }, at)
+        .to(tag.element.querySelector('.cx-algo-cross'), { autoAlpha: 1, scale: 1, duration: 0.35 }, at + 0.12);
+    });
+    timeline.to(headlines[1], { autoAlpha: 0, y: -12, duration: 0.3 }, 4.65)
+      .fromTo(headlines[2], { y: 18 }, { autoAlpha: 1, y: 0, duration: 0.5 }, 4.83)
+      .fromTo(result, { y: 24, scale: 0.88 }, { autoAlpha: 1, y: 0, scale: 1, duration: 0.65 }, 5.25)
+      .to({}, { duration: 0.65 }, 5.9);
+    let trigger;
+    if (media.matches) timeline.progress(1);
+    else trigger = ST.create({ trigger: wrapper, start: 'top top', end: 'bottom bottom', animation: timeline, scrub: 0.85 });
+    // Synchronize accessible status with scroll, including reverse scrolling.
+    function updateStatus() {
+      tags.forEach(tag => { tag.status.textContent = tag.fails && timeline.time() >= 3.37 + tags.filter(t => t.fails).indexOf(tag) * 0.1 ? ': drift detected' : ': validated'; });
+    }
+    timeline.eventCallback('onUpdate', updateStatus); updateStatus();
+    cleanups.push(() => { resize.disconnect(); if (trigger) trigger.kill(); timeline.kill(); scene.remove(); code.classList.remove('cx-algo-code'); });
   }
   function systemOrbit(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;

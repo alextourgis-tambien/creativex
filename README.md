@@ -211,3 +211,24 @@ pour un mouvement plus lent au scroll. Les cartes sont relevées de 30 % de leur
 largeur, avec un maximum de 84 px, pour laisser voir les statistiques. Le cadre
 interne autorise le chevauchement derrière le contenu ; `.green-bg` conserve
 la découpe sur les bords de la section et la hauteur reste inchangée.
+
+## Campaign drift : quatre étapes au scroll
+
+`.algo__wrapper` (300vh) contient `.algo__code` (100vh, sticky top:0), déjà
+configurés dans Webflow. Le runtime ajoute le brief avec portrait, dix connexions
+SVG pointillées, huit statuts, la carte SpritzNYC et le résultat 40%.
+La timeline suit toute la course disponible du sticky, avec un scrub de 0.85s :
+brief et léger scale, connexions et validations, cinq écarts rouges (channels,
+target audience, markets, budget, design), puis résultat final. Chaque étape
+reste réversible quand le visiteur remonte. Les trois phrases se remplacent
+par fondu et léger déplacement vertical ; le texte utilise la fonte Greed.
+
+Sur mobile, le diagramme utilise une composition verticale de 600 × 930 plutôt
+qu’une miniature desktop : brief plus haut, statuts redistribués, phrases sur
+deux ou trois lignes, carte de résultat superposée à la campagne. Le contenu
+s’ajuste à la largeur et à la hauteur de l’emplacement, sans débordement horizontal.
+Les connexions sont masquées puis dessinées sans plugin supplémentaire.
+Mouvement réduit : le dernier état est visible sans animation liée au scroll.
+
+Les deux images sont hébergées par Webflow. Pour les remplacer, renseigner les
+attributs `data-cx-avatar` et `data-cx-campaign` sur `.algo__wrapper` avec les URLs.
