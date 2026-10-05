@@ -142,7 +142,7 @@ absence de débordement horizontal, panneaux lisibles et fixture mouvement rédu
 
 `.images-loop-wrapper` / `.images-loop-track` : les `.card` suivent un arc circulaire
 avec une rotation tangente. GSAP ScrollTrigger anime leur position de `top bottom`
-à `bottom top`, avec `scrub: 0.9` : défilement à gauche en descendant, retour en
+à `bottom top`, avec `scrub: 1.2` : défilement à gauche en descendant, retour en
 remontant, arrêt quand le scroll se stabilise. La jonction des copies se fait hors
 champ. La hauteur reste celle d’une rangée de cartes : l’arc est coupé sur les bords
 du cadre, sans agrandir la section. Les mesures se recalculent sur mobile et au resize.
@@ -202,3 +202,9 @@ circulent en 22 secondes avec une opacité pulsée. L’ensemble apparaît en fo
 au scroll, s’arrête hors écran ou dans un onglet masqué, et reste statique avec
 le mouvement réduit. Le cadrage reste circulaire, même dans un wrapper mobile
 rectangulaire, sans modifier la taille Webflow de la section.
+
+Le radial marquee parcourt environ 55 % de la largeur du cadre (minimum 1,5 carte),
+pour un mouvement plus lent au scroll. Les cartes sont relevées de 30 % de leur
+largeur, avec un maximum de 84 px, pour laisser voir les statistiques. Le cadre
+interne autorise le chevauchement derrière le contenu ; `.green-bg` conserve
+la découpe sur les bords de la section et la hauteur reste inchangée.

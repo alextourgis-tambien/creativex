@@ -423,7 +423,7 @@
         const relative = x + cardWidth / 2 - width / 2;
         const angle = Math.asin(Math.max(-0.95, Math.min(0.95, relative / radius)));
         setters[index].x(x);
-        setters[index].y(34 + radius * (1 - Math.cos(angle)));
+        setters[index].y(-Math.min(84, cardWidth * 0.3) + radius * (1 - Math.cos(angle)));
         setters[index].rotation(angle * 180 / Math.PI);
       });
     }
@@ -450,8 +450,8 @@
       clearTimeout(resizeTimer); resizeTimer = setTimeout(() => ST.refresh(), 100);
     }
     measure();
-    const motion = gsap.to(state, { offset: () => spacing * Math.max(4, width / spacing * 1.4), ease: 'none',
-      onUpdate: render, scrollTrigger: { trigger: wrapper, start: 'top bottom', end: 'bottom top', scrub: 0.9, invalidateOnRefresh: true } });
+    const motion = gsap.fromTo(state, { offset: 0 }, { offset: () => Math.max(spacing * 1.5, width * 0.55), ease: 'none',
+      onUpdate: render, scrollTrigger: { trigger: wrapper, start: 'top bottom', end: 'bottom top', scrub: 1.2, invalidateOnRefresh: true } });
     const resize = new ResizeObserver(measure); resize.observe(wrapper);
     originals.forEach(card => card.querySelectorAll('img').forEach(img => { resize.observe(img); listen(img, 'load', measure); }));
     cleanups.push(() => {
