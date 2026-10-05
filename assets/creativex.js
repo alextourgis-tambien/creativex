@@ -184,6 +184,7 @@
     document.querySelectorAll('.solution-hero-wrapper').forEach(solutionHeroParallax);
     document.querySelectorAll('.ver-carousel__wrapper').forEach(verticalCarousel);
     document.querySelectorAll('.h-ver__img-parent.is--1,.h-ver__img-parent.is--2,.h-ver__img-parent.is--3').forEach(verticalHeroParallax);
+    document.querySelectorAll('.h-about__img-parent').forEach(aboutHeroParallax);
   }
   function collectionFilter(filter) {
     if (prepared.has(filter) || filter.closest('[data-cx-motion="off"]')) return;
@@ -324,6 +325,26 @@
       });
     });
     cleanups.push(() => { timeline.scrollTrigger.kill(); timeline.kill(); wrapper.classList.remove('cx-ver-carousel'); });
+  }
+  function aboutHeroParallax(image) {
+    const variant = Array.from(image.classList).find(name => /^is--[1-9]$/.test(name));
+    if (!variant || prepared.has(image) || image.closest('[data-cx-motion="off"]')) return;
+    prepared.add(image);
+    const previous = image.getAttribute('style');
+    const initialY = Number(gsap.getProperty(image, 'y')) || 0;
+    const distance = [-110, -160, -130, -95, 75, 100, 140, -100, 80][Number(variant.slice(4)) - 1];
+    const tween = gsap.fromTo(image, { y: initialY }, {
+      y: () => initialY + distance * (innerWidth < 768 ? 0.45 : 1),
+      ease: 'none',
+      scrollTrigger: {
+        trigger: image.closest('section,.section') || image.parentElement,
+        start: 'top top', end: 'bottom top', scrub: 1.1, invalidateOnRefresh: true
+      }
+    });
+    cleanups.push(() => {
+      tween.scrollTrigger.kill(); tween.kill();
+      if (previous === null) image.removeAttribute('style'); else image.setAttribute('style', previous);
+    });
   }
   function verticalHeroParallax(image) {
     if (prepared.has(image) || image.closest('[data-cx-motion="off"]')) return;
