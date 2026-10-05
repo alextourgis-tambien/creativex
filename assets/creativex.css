@@ -159,6 +159,7 @@ html.lenis, html.lenis body { height: auto; }
 .cx-filter-meta { display: none !important; }
 .cx-collection-filter .filter__text-wrapper { cursor: pointer; transition: background-color .25s ease, color .25s ease; }
 .cx-collection-filter .filter__text-wrapper[aria-pressed="true"] { background: #003e50; color: #fff; }
+.cx-collection-filter .filter__text-wrapper[aria-pressed="true"] .filter__text { color: inherit; }
 .cx-filter-all { font: inherit; color: inherit; text-align: left; border: 0; background: transparent; width: 100%; padding: 12px 16px; }
 .cx-collection-filter .filter__text-wrapper:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
 .cx-filter-empty { padding: 24px 0; }
