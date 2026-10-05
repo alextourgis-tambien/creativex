@@ -190,8 +190,9 @@ Greed sur la dernière ligne des titres. Mouvement réduit : état final statiqu
 
 La dernière ligne reçoit un vrai `span.span__greed` inline : son bloc de ligne
 conserve la fonte serif et sa baseline, comme dans le builder Webflow. Les titres
-multilignes animés utilisent une colonne flex pour empêcher la fusion des marges
-négatives des masques et retrouver exactement l’espacement natif entre les lignes.
+multilignes animés conservent leur mise en page Webflow. Les masques utilisent
+un clip-path étendu sans padding ni marge pour préserver les baselines natives
+et permettre à SplitText de recalculer les lignes après un redimensionnement.
 SplitText recalcule la dernière ligne aux changements de largeur et de police.
 
 ## Système orbital CreativeX
