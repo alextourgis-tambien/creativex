@@ -35,8 +35,9 @@ Les fichiers sont servis via jsDelivr depuis ce dépôt public, sans build npm.
 - Recalcul des lignes quand la largeur ou les polices changent via SplitText `autoSplit`.
 
 Les grandes séquences restent à travailler ensemble. Les animations existantes des
-sections `.section-observability`, `.section-bussiness` et `.images-loop-wrapper`
-sont conservées et exclues des nouvelles révélations de texte.
+sections `.section-observability` et `.section-bussiness` sont conservées.
+La section `.images-loop-wrapper` utilise désormais le radial marquee ci-dessous ;
+les trois séquences restent exclues des révélations de texte globales.
 
 Les `.obs-card` flottent en continu : déplacement vertical de 6 à 13 px, légère
 dérive horizontale et oscillation de 0,9 degré. Chaque carte a une phase et une
@@ -124,3 +125,14 @@ attributs des pays. Il est chargé depuis la même version CDN que `world.js`.
 
 Validation : syntaxe JS, rendu de la home Webflow sur desktop et à 390 px,
 absence de débordement horizontal, panneaux lisibles et fixture mouvement réduit.
+
+## Radial cards au scroll
+
+`.images-loop-wrapper` / `.images-loop-track` : les `.card` suivent un arc circulaire
+avec une rotation tangente. GSAP ScrollTrigger anime leur position de `top bottom`
+à `bottom top`, avec `scrub: 0.9` : défilement à gauche en descendant, retour en
+remontant, arrêt quand le scroll se stabilise. La jonction des copies se fait hors
+champ. L’arc, la hauteur et l’espacement se recalculent sur mobile et au resize.
+Les copies sont décoratives (`aria-hidden`, `inert`). Mouvement réduit : rangée native.
+L’ancien script inline home ciblant `.loop-card` et sa CSS ont été remplacés par
+ce module ; les cartes réelles portent la classe `.card`.

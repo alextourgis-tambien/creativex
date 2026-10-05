@@ -151,6 +151,68 @@
     });
     document.querySelectorAll('.obs-card').forEach(floatCard);
     document.querySelectorAll('.logo-wrapper').forEach(logoMarquee);
+    document.querySelectorAll('.images-loop-wrapper').forEach(radialCards);
+  }
+  function radialCards(wrapper) {
+    if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
+    const track = wrapper.querySelector('.images-loop-track');
+    if (!track) return;
+    const originals = Array.from(track.children).filter(card => card.matches('.card,.loop-card'));
+    if (!originals.length) return;
+    prepared.add(wrapper); wrapper.classList.add('cx-radial');
+    const previousTrackStyle = track.getAttribute('style');
+    const originalStyles = originals.map(card => card.getAttribute('style'));
+    originals.forEach(card => card.classList.add('cx-radial-card'));
+    const state = { offset: 0 };
+    let copies = [], cards = [], setters = [], spacing = 0, total = 0, width = 0, radius = 0, cardWidth = 0, resizeTimer;
+    function render() {
+      if (!spacing || !total) return;
+      cards.forEach((card, index) => {
+        const x = ((index * spacing - state.offset + spacing * 2) % total + total) % total - spacing * 2;
+        const relative = x + cardWidth / 2 - width / 2;
+        const angle = Math.asin(Math.max(-0.95, Math.min(0.95, relative / radius)));
+        setters[index].x(x);
+        setters[index].y(34 + radius * (1 - Math.cos(angle)));
+        setters[index].rotation(angle * 180 / Math.PI);
+      });
+    }
+    function measure() {
+      copies.forEach(card => card.remove()); copies = [];
+      width = wrapper.clientWidth; cardWidth = originals[0].offsetWidth;
+      if (!width || !cardWidth) return;
+      spacing = cardWidth + (innerWidth < 768 ? 28 : 52);
+      radius = Math.max(width * 1.05, cardWidth * 3.4);
+      const groups = Math.max(1, Math.ceil((width + spacing * 4) / (spacing * originals.length)));
+      for (let group = 1; group < groups; group++) originals.forEach((card, index) => {
+        const copy = card.cloneNode(true);
+        if (originalStyles[index] === null) copy.removeAttribute('style'); else copy.setAttribute('style', originalStyles[index]);
+        copy.setAttribute('aria-hidden', 'true'); copy.setAttribute('inert', ''); copy.removeAttribute('id');
+        copy.querySelectorAll('[id]').forEach(node => node.removeAttribute('id'));
+        copy.querySelectorAll('img').forEach(img => { img.loading = 'eager'; });
+        track.append(copy); copies.push(copy);
+      });
+      cards = originals.concat(copies); total = cards.length * spacing;
+      setters = cards.map(card => ({ x: gsap.quickSetter(card, 'x', 'px'), y: gsap.quickSetter(card, 'y', 'px'), rotation: gsap.quickSetter(card, 'rotation', 'deg') }));
+      const edge = Math.min(radius * 0.95, width / 2 + cardWidth / 2);
+      const depth = radius - Math.sqrt(radius * radius - edge * edge);
+      track.style.height = Math.ceil(originals[0].offsetHeight + depth + 90) + 'px';
+      render();
+      clearTimeout(resizeTimer); resizeTimer = setTimeout(() => ST.refresh(), 100);
+    }
+    measure();
+    const motion = gsap.to(state, { offset: () => spacing * Math.max(4, width / spacing * 1.4), ease: 'none',
+      onUpdate: render, scrollTrigger: { trigger: wrapper, start: 'top bottom', end: 'bottom top', scrub: 0.9, invalidateOnRefresh: true } });
+    const resize = new ResizeObserver(measure); resize.observe(wrapper);
+    originals.forEach(card => card.querySelectorAll('img').forEach(img => { resize.observe(img); listen(img, 'load', measure); }));
+    cleanups.push(() => {
+      clearTimeout(resizeTimer); resize.disconnect(); motion.scrollTrigger.kill(); motion.kill();
+      copies.forEach(card => card.remove()); wrapper.classList.remove('cx-radial');
+      originals.forEach((card, index) => {
+        card.classList.remove('cx-radial-card'); gsap.set(card, { clearProps: 'transform,translate,rotate,scale' });
+        if (originalStyles[index] === null) card.removeAttribute('style'); else card.setAttribute('style', originalStyles[index]);
+      });
+      if (previousTrackStyle === null) track.removeAttribute('style'); else track.setAttribute('style', previousTrackStyle);
+    });
   }
   function logoMarquee(wrapper) {
     if (prepared.has(wrapper) || wrapper.closest('[data-cx-motion="off"]')) return;
