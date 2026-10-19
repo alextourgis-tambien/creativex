@@ -1,18 +1,13 @@
-<!-- Webflow: Site settings → Custom code → Head code -->
-<script>
-(function () {
-  try {
-    var next = sessionStorage.getItem('cx-next-page');
-    sessionStorage.removeItem('cx-next-page');
-    if (next === location.href && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      document.documentElement.classList.add('cx-entering');
-      window.cxEntryFallback = setTimeout(function () {
-        document.documentElement.classList.remove('cx-entering');
-      }, 4000);
-    }
-  } catch (_) {}
-})();
-</script>
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-N4CFPQM');</script>
+<!-- End Google Tag Manager -->
+
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alextourgis-tambien/creativex@935428fde50b3780d4bb1ee129ecb6d88a4d4552/assets/creativex.css">
-<!-- CreativeX campaign globe -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alextourgis-tambien/creativex@f7b5d073c4261cb98aa37e44d53dc46f125bbb90/assets/world.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/alextourgis-tambien/creativex@2a589e7882461aeaa53a82e67a261517a9034b32/assets/global-custom.css">
+<!-- Synchronous: register navigation and DOMContentLoaded hooks before the body. -->
+<script src="https://cdn.jsdelivr.net/gh/alextourgis-tambien/creativex@2a589e7882461aeaa53a82e67a261517a9034b32/assets/global-head.js"></script>
